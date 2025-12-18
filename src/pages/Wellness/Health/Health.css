@@ -1,0 +1,298 @@
+.wellness-section {
+  
+
+     margin-top: 110px;
+    /* margin-left: 280px; */
+    margin-bottom: 10%; 
+    color: #333;
+}
+.hosetl-imagee-1{
+    /* border: 2px solid red; */
+
+}
+
+.ambulance-no{
+    /* border: 2px solid brown; */
+}
+.health{
+    display: flex;
+}
+.event{
+    border:2px solid red;
+    width: 100vh;
+    height: 300px;
+    /* display: flex; */
+    justify-content: center;
+    align-items: center;
+}
+
+.wellness-centre {
+    margin-right: 10px;
+}
+.fs-font p{
+    font-size: 1.5rem;
+    line-height: 27px;
+}
+.fs-font li{
+    font-size: 1.2rem;
+    line-height: 27px;
+}
+.wellness-header{
+    animation: fade-up 0.5s;
+}
+.wellness-centre{
+    animation: fade-up 0.5s;
+}
+.wellness-header p {
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: rgb(30, 64, 175);
+}
+.wellness-text{
+    padding: 0px 30px;
+    animation: fade-up 0.5s;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    color: #4c5157;
+}
+.wellness-text p {
+    font-size: 1.3rem;
+    line-height: 27px;
+}
+.wellness{
+    margin-top: 60px;
+}
+.well-coun {
+    /* justify-content: space-around;
+    flex-wrap: wrap; */
+}
+
+.hostel-imagee-2 {
+    width: 700px;
+    animation: fade-up 0.5s;
+    /* border: 2px solid salmon; */
+}
+
+.wellness-sub-header {
+    font-size: 1.5rem;
+}
+
+.wellness-link {
+    font-size: 1.2rem;
+}
+/* 
+.counselling:hover {
+    border: 1px solid #f43f5e;
+} */
+
+.wellness-centre img {
+    width: 45vw;
+    height: 50vh;
+}
+
+.dean {
+    width: 390px;
+}
+.map{
+    margin-top: 15px;
+    border: 2px solid rgb(94, 83, 83);
+    display: inline-block;
+    padding: 5px;
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2);
+    font-weight: 600;
+    /* background: linear-gradient(45deg, #fae8ff, #fae8ff); */
+    background-color:#fae8ff;
+}
+.map:hover{
+    /* background-color: rgb(140, 13, 13); */
+    color: white;
+    border-color: gray;
+}
+
+.ambulance-no{
+    animation: shad 1.5s linear infinite;
+    animation: fade-up 0.5s;
+    padding: 15px;
+    height: 280px;
+    width: 400px;
+   
+    background-color:#fae8ff ;
+    /* margin-bottom: 73px; */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+}
+.p1{
+ font-size: 30px;
+ font-weight: 700;
+}
+.p2{
+    font-size: 25px;
+
+}
+
+
+@keyframes fade-down {
+    0%{
+        opacity: 0;
+        transform: translateY(-30px) scale(0.9);
+    }
+    100%{
+        opacity: 1;
+        transform: translateY(0px) scale(1);
+    }
+}
+@keyframes fade-up {
+    0%{
+        opacity: 0;
+        transform: translateY(30px) scale(0.9);
+    }
+    100%{
+        opacity: 1;
+        transform: translateY(0px) scale(1);
+    }
+}
+@keyframes shad {
+    0% {
+        opacity: 1;
+        scale: 1.1;
+
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.wellness-center:hover {
+    border: 1px solid #f43f5e;
+}
+.wellness-header{
+    margin-left: 30px;
+}
+
+@media (max-width:1024px) {
+    .wellness-section {
+        margin-left: 0px;
+        margin-right: 0px;
+        margin-top: 110px;
+       
+
+        width: 100%;
+    }
+    
+    .fs-font p{
+        font-size: 1rem;
+        line-height: 30px;
+    }
+    .ambulance-no{
+        padding: 10px;
+    }
+    .ambulance-no p{
+        font-size: 1.3rem;
+    }
+    .hosetl-imagee-1 {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .wellness-text {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .dean {
+        width: 100%;
+        height: 320px;
+        margin: auto;
+    }
+    
+    .wellness-section p {
+        font-size: 1.1rem;
+        line-height: 30px;
+    }
+
+    .wellness-section-s1 {
+        flex-wrap: wrap;
+    }
+
+   
+
+    .wellness-centre {
+        margin: 0px 10px;
+        margin-bottom: 30px;
+        width: 100%;
+
+
+    }
+
+    .counselling-centre {
+        width: 100%;
+        margin-left: 40px;
+    }
+
+    .wellness-centre img {
+        width: 400px;
+        height: 400px;
+
+
+    }
+
+    .well-coun {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .wellness-counselling-ce {
+        flex-wrap: wrap;
+        gap: 100px;
+        padding: 10px;
+    }
+    .wellness-header p {
+        font-weight: 600;
+        font-size: 1.3rem;
+        color: rgb(30, 64, 175);
+    }
+}
+
+
+@media (min-width:1700px) {
+    .first-info {
+        width: 500px;
+        height: 300px;
+    }
+
+    .dean {
+        width: 550px;
+    }
+    .wellness-text{
+        margin-bottom: 30px;
+        margin-top: 30px;
+        padding: 0px 20px;
+    }
+    .wellness-section p {
+        font-size: 1.5rem;
+        line-height: 35px;
+        
+    }
+    .wellness-section {
+       padding-left: 50px;
+       padding-right: 150px;
+      
+    }
+    .wellness-header p{
+        font-size: 2.3rem;
+    }
+   .wellness-centre  li{
+        font-size: 1.7rem;
+    }
+    .counselling-centre li{
+        font-size: 1.7rem;
+    }
+}

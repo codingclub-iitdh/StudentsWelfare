@@ -1,0 +1,215 @@
+.image-carousel-wrapper {
+  width: 100%;
+}
+
+/* Main Carousel */
+.carousel-main {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0;
+  background: #f5f5f5;
+}
+
+.carousel-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  max-height: 350px;
+}
+
+/* Navigation Arrows */
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.carousel-nav:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-nav-prev {
+  left: 15px;
+}
+
+.carousel-nav-next {
+  right: 15px;
+}
+
+/* Image Counter */
+.carousel-counter {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Dot Indicators - positioned inside carousel */
+.carousel-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 12px;
+  flex-wrap: wrap;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 20px;
+  z-index: 10;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.dot.active {
+  background: #fff;
+  width: 28px;
+  border-radius: 5px;
+}
+
+.dot:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+/* No Images Placeholder */
+.no-images {
+  width: 100%;
+  padding: 60px 20px;
+  text-align: center;
+  background: #f9f9f9;
+  border-radius: 12px;
+  border: 2px dashed #ddd;
+}
+
+.no-images p {
+  color: #999;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1024px) {
+  .carousel-image {
+    max-height: 280px;
+  }
+
+  .carousel-nav {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .carousel-nav-prev {
+    left: 10px;
+  }
+
+  .carousel-nav-next {
+    right: 10px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .carousel-image {
+    max-height: 220px;
+  }
+
+  .carousel-nav {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+
+  .carousel-nav-prev {
+    left: 8px;
+  }
+
+  .carousel-nav-next {
+    right: 8px;
+  }
+
+  .carousel-counter {
+    bottom: 10px;
+    right: 10px;
+    font-size: 0.8rem;
+    padding: 4px 10px;
+  }
+
+  .carousel-dots {
+    gap: 6px;
+    padding: 5px 10px;
+    bottom: 8px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .carousel-image {
+    max-height: 180px;
+  }
+
+  .carousel-nav {
+    width: 30px;
+    height: 30px;
+    font-size: 0.75rem;
+  }
+
+  .carousel-nav-prev {
+    left: 5px;
+  }
+
+  .carousel-nav-next {
+    right: 5px;
+  }
+
+  .carousel-counter {
+    bottom: 6px;
+    right: 6px;
+    font-size: 0.65rem;
+    padding: 2px 8px;
+  }
+
+  .carousel-dots {
+    gap: 4px;
+    padding: 4px 8px;
+    bottom: 6px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .dot.active {
+    width: 18px;
+  }
+}

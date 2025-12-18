@@ -1,0 +1,83 @@
+.event-scroller {
+    margin: 30px 0;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    text-align: center;
+    /* border: 2px solid red; */
+    width: 80vw;
+    /* height: 250px; */
+    background-color:  white;
+  }
+  .head{
+    font-size: 1.6rem;
+    /* border: 2px solid red; */
+    text-align: left;
+    font-weight: 600;
+  }
+  .event-card {
+    /* padding: 10px; */
+    /* border:2px solid green; */
+    /* height: 150px; */
+    display: flex;
+    text-align: left;
+    /* justify-content: center; */
+    /* flex-direction: column; */
+    /* align-items: center; */
+    /* border: 2px solid red; */
+    /* width: 100%; */
+    
+  }
+  .event-all{
+    display: grid;
+    grid-template-columns: auto 2fr ;
+    grid-gap:30px ;
+  }
+  .event-image {
+    
+    /* width: 120px; */
+    /* height: 120px; */
+    /* display: grid; */
+    /* justify-content: center; */
+    /* grid-template-rows: 1fr 1fr; */
+    
+    /* border: 2px solid green; */
+    border-radius: 8px;
+  }
+  .event-image img{
+    object-fit: fill;
+  }
+  .event-title {
+    /* margin-top: 10px; */
+
+    font-size: 1.8rem;
+    /* text-align: left; */
+    font-weight: semibold;
+    margin-top: 10px;
+    /* border: 2px solid black; */
+  }
+  .speaker{
+    font-size: 1.3rem;
+    margin-top: 20px;
+    font-weight: 600;
+  }
+  .venue{
+    font-size:1.3rem ;
+    /* margin-top: 15px; */
+  }
+  .pdf{
+    border: 2px solid black;
+    color: black;
+    font-size: 1.3rem;
+    padding: 4px;
+  }
+  .pdf:hover{
+    color: white;
+    background-color: rgb(197, 187, 187);
+  }
+  .pdf-wrap{
+    margin-top: 25px;
+
+  }
+
+  

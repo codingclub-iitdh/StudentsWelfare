@@ -1,0 +1,85 @@
+.student-campus-life{
+    /* margin-left: 290px;
+    margin-top: 110px;
+    margin-bottom: 10%;
+
+        padding-left: 30px;
+        padding-right: 20px; */
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-top: 50px;
+        animation: fade-up 0.5s;
+}
+@keyframes fade-down {
+    0%{
+        opacity: 0;
+        transform: translateY(-30px) scale(0.9);
+    }
+    100%{
+        opacity: 1;
+        transform: translateY(0px) scale(1);
+    }
+  }
+  @keyframes fade-up {
+    0%{
+        opacity: 0;
+        transform: translateY(30px) scale(0.9);
+    }
+    100%{
+        opacity: 1;
+        transform: translateY(0px) scale(1);
+    }
+  }
+
+.student-campus-life{
+    /* margin-left: 290px; */
+    background-color: white;
+    /* margin-top: 120px; */
+    margin-bottom: 10%;
+}
+.hostel-imagee{
+   margin: 30px;
+   display: flex;
+   gap: 30px;
+   flex-wrap: wrap;
+}
+.hosetl-imagee-1 img{
+    width: 450px;
+    height: 350px;
+
+}
+.sub-header p{
+    font-size: 1.5rem;
+}
+
+@media screen and (max-width:1024px){
+    .student-campus-life{
+        margin-left: 0px;
+        margin-right: 0px;
+        margin-top: 110px;
+        margin-bottom: 30%;
+        width: 100%;
+        padding-left: 1px;
+        padding-right: 6px;
+    }
+    .hostel-imagee{
+        justify-content: center;
+       margin: auto;
+       margin-top: 20px;
+
+    }
+
+
+}
+@media screen and (min-width:1700px){
+    .student-campus-life{
+        padding-left: 30px;
+        padding-right: 150px;
+    }
+    .sub-header p{
+        font-size: 2.3rem;
+    }
+}

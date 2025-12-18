@@ -1,0 +1,284 @@
+.gymkhana-council-box {
+    border: 3px solid #c084fc;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 20px;
+    height: 100%;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.gymkhana-council-box:hover {
+    background-color: #c084fc55;
+    color: #000;
+}
+
+.gymkhana-council-box p {
+    text-align: center;
+    margin: 10px;
+    font-weight: 600;
+    font-size: 1.7rem;
+}
+
+.gymkhana-council-box ul {
+    font-size: 20px;
+    font-weight: 600;
+    position: relative;
+}
+
+.gymkhana-council-box ul li {
+    margin-bottom: 10px;
+}
+
+.blink-shadow {
+    position: absolute;
+    background-color: #c084fc;
+    padding: 5px 15px;
+    border-radius: 5px;
+}
+
+/*================================================================*/
+.main-gymkhana {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+
+    /* margin-left: 290px; */
+    /* margin-right: 20px; */
+    margin-bottom: 10%;
+    animation: fade-up 0.5s;
+}
+@keyframes fade-down {
+    0%{
+        opacity: 0;
+        transform: translateY(-30px) scale(0.9);
+    }
+    100%{
+        opacity: 1;
+        transform: translateY(0px) scale(1);
+    }
+  }
+  @keyframes fade-up {
+    0%{
+        opacity: 0;
+        transform: translateY(30px) scale(0.9);
+    }
+    100%{
+        opacity: 1;
+        transform: translateY(0px) scale(1);
+    }
+  }
+.gymkhana-sub-1:hover {
+    background-color: #c084fc;
+    color: #f8fafc;
+
+}
+.gymkhana-header h3{
+    font-size: 2rem;
+    font-weight: 600;
+}
+.gymkhana-font p {
+    font-size: 1.5rem;
+}
+.tech-club-fs p{
+    line-height: 27px;
+}
+
+.tech-board-sub-header {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin: 25px 0px 10px 0px;
+    padding-left: 10px;
+    border-left: 5px solid #c00404;
+}
+
+.list-items li {
+    font-size: 23px;
+    margin-top: 20px;
+
+}
+
+.sentense-gymkhana p {
+    font-size: 1.3rem;
+    color: #4c5157;
+    line-height: 25px;
+
+}
+
+.sports-section-header {
+    margin: 30px 0px 10px 0px;
+}
+
+img {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+    object-position: center;
+    background-color: rgb(150, 149, 149);
+    transition: all ease-in-out 0.3s;
+
+}
+
+img:hover {
+/*     box-shadow: rgba(0, 0, 0, 0.4) 0px 30px 90px; */
+    opacity: 0.9;
+    cursor: pointer;
+}
+
+.gymkhana-photos {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.list-items p {
+    font-size: 1.4rem;
+    color: #0284c7;
+}
+
+.list-items ul li a:hover {
+    color: #ef4444;
+
+}
+
+.gymkhana-sub-1 {
+    width: 275px;
+    height: 250px;
+}
+
+.image-div img {
+    width: 600px;
+}
+
+.board-flex {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.tech-board p {
+    font-size: 1.3rem;
+}
+.t-fs-t p{
+    font-size: 1.3rem;
+    line-height: 27px;
+}
+
+@media (min-width:1700px) {
+    .image-div img {
+        width: 650px;
+    }
+
+    .main-gymkhana {
+        padding-left: 30px;
+        padding-right: 150px;
+    }
+
+    .gymkhana-font p {
+        font-size: 1.5rem;
+        line-height: 35px;
+
+    }
+    .tech-board p{
+        font-size: 1.5rem;
+        line-height: 35px;
+    }
+    .sports-photos p {
+        font-size: 1.5rem;
+        line-height: 35px;
+    }
+    .list-items ul li {
+        font-size: 1.7rem;
+    }
+}
+
+@media (max-width:1024px) {
+    .main-gymkhana {
+        margin-left: 0px;
+        margin-right: 0px;
+        margin-top: 110px;
+        margin-bottom: 50%;
+        width: 100vw;
+
+        padding-right: 30px;
+    }
+    .t-fs-t p{
+        font-size: 1.1rem;
+        line-height: 30px;
+    }
+    .tech-board{
+        margin-top: 30px;
+    }
+    .gymkhana-header h3{
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: rgb(30, 64, 175);
+    }
+    .tech-club-fs{
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    .tech-club-fs p{
+        line-height: 30px;
+    }
+    .tech-board{
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .alumni-fs p{
+        font-size: 1rem;
+    }
+
+    .gymkhana-sub {
+        flex-wrap: wrap;
+    }
+
+    .image-div img {
+        width: 250px;
+        height: 230px;
+    }
+
+    .list-items {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .board-flex {
+        gap: 20px;
+    }
+
+    .gymkhana-font p {
+        font-size: 1.1rem;
+        line-height: 20px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .list-items ul li {
+        font-size: 1.1rem;
+    }
+
+    .tech-board-sub-header {
+        font-size: 1.5rem;
+        margin-left: 20px;
+    }
+
+    .tech-board-sub-header p {
+        font-size: 1.3rem;
+    }
+
+
+
+    h3 {
+        font-size: 1.5rem;
+    }
+
+    .tech-board p {
+        font-size: 1.1rem;
+        line-height: 30px;
+    }
+}

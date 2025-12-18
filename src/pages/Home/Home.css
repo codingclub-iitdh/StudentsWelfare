@@ -1,0 +1,508 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,400;0,500;0,600;0,700&display=swap');
+
+* {
+  font-family: "Jost";
+  scroll-behavior: smooth;
+}
+
+/* ========== MAIN HOME PAGE (Landing) ========== */
+.home-main-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: #4c5157;
+  width: 100%;
+}
+
+.home-title h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 60px;
+  color: #4c5157;
+}
+
+.home-sections-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  width: 100%;
+  margin-bottom: 100px;
+}
+
+.section-card {
+  width: 100%;
+  max-width: 450px;
+  height: 300px;
+  border: 2px solid #d1d5db;
+  padding: 40px;
+  text-decoration: none;
+  color: #4c5157;
+  transition: all 0.5s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #fdf4ff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.section-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: var(--bg-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+/* overlay layer to darken the background image */
+.section-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* 50% black */
+  z-index: 1;
+  transition: background-color 0.35s ease-in-out;
+}
+
+.section-card:hover::after {
+  background-color: rgba(0, 0, 0, 0.1); /* 10% black on hover */
+}
+
+.section-content {
+  position: relative;
+  z-index: 2; /* above image and overlay */
+  color: white;
+}
+
+.section-content h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.section-content p {
+  font-size: 1.2rem;
+  line-height: 28px;
+}
+
+/* remove text stroke on hover so text doesn't get a bordered look */
+.section-card:hover .section-content h2,
+.section-card:hover .section-content p {
+  -webkit-text-stroke: 0;
+}
+
+/* ===== Responsive Cards ===== */
+@media (max-width: 1024px) {
+  .home-sections-container {
+    flex-direction: column;
+    gap: 30px;
+    margin-bottom: 50px;
+  }
+
+  .section-card {
+    max-width: 100%;
+    height: 250px;
+    padding: 30px;
+  }
+
+  .section-content h2 {
+    font-size: 1.8rem;
+  }
+
+  .section-content p {
+    font-size: 1.1rem;
+    line-height: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-main-page {
+    padding: 20px 15px;
+  }
+
+  .home-title h1 {
+    font-size: 2rem;
+  }
+
+  .home-sections-container {
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+
+  .section-card {
+    height: 200px;
+    padding: 25px;
+  }
+
+  .section-content h2 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+
+  .section-content p {
+    font-size: 1rem;
+    line-height: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-title h1 {
+    font-size: 1.8rem;
+  }
+
+  .section-card {
+    height: 180px;
+    padding: 20px;
+  }
+
+  .section-content h2 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+
+  .section-content p {
+    font-size: 0.95rem;
+    line-height: 20px;
+  }
+}
+
+/* ===================================================== */
+/* ========== STUDENT WELFARE HOME (About + Charter) ========== */
+.home {
+  color: #4c5157;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 50px auto;
+  margin-bottom: 15%;
+  
+  overflow-x: hidden;
+}
+
+.App {
+  overflow-y: auto;
+  text-align: center;
+  color: #4c5157;
+  width: 80vw;
+}
+
+.image_wrapper {
+  height: 55vh;
+  width: 70vw;
+  margin: 0 10px;
+}
+
+.image_wrapper img {
+  width: 70vw;
+  height: 55vh;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* --- About + Charter Section --- */
+.wrapper-about {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 25px;
+  flex-wrap: wrap;
+  margin-top: 40px;
+  width: 90%;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.about-page {
+  /* allow the about column to shrink on small screens */
+  flex: 1 1 360px;
+  min-width: 0; /* critical to allow flex children to shrink on narrow viewports */
+  padding: 10px 15px;
+  box-sizing: border-box;
+}
+
+.about-page ul p {
+  font-size: 1.7rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.about-page ul li p {
+  font-size: 1.25rem;
+  line-height: 1.8rem;
+  font-weight: 400;
+  margin-bottom: 12px;
+}
+
+/* --- Charter Section --- */
+.charter {
+  /* allow the charter column to shrink and wrap gracefully */
+  flex: 1 1 420px;
+  min-width: 0; /* allow shrink below 450px on small screens */
+  border: 2px solid #d1d5db;
+  background-color: #fdf4ff;
+  border-radius: 10px;
+  padding: 15px 20px;
+  box-sizing: border-box;
+  transition: box-shadow 0.3s ease-in-out;
+  word-wrap: break-word;
+}
+
+.charter:hover {
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.location-header {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+/* --- Vertical Infinite Scroll --- */
+
+.marqueee {
+  width: 100%;
+  /* allow the box to shrink on small screens while capping max height */
+  height: auto;
+  max-height: 350px;
+  overflow: hidden;
+  position: relative;
+  background: #fae8ff;
+  color: #333;
+  border-radius: 6px;
+}
+
+.marqueee-content {
+  /* stack the duplicated lists vertically using flex so the container height equals two copies
+     and translateY(-50%) will scroll by exactly one copy for a seamless loop */
+  display: flex;
+  flex-direction: column;
+  animation: smooth-scroll 45s linear infinite;
+  will-change: transform;
+}
+
+.marqueee-content > ul {
+  margin: 0;
+  padding: 10px 20px;
+  box-sizing: border-box;
+}
+
+.marqueee-content ul {
+  margin: 0;
+  padding: 10px 20px;
+}
+
+.no-bullets {
+  list-style: none;
+  padding-left: 0;
+}
+
+.no-bullets li {
+  font-size: 1.15rem;
+  line-height: 1.9rem;
+  margin-bottom: 10px;
+  font-weight: 400;
+}
+
+
+/* scroll the duplicated block by 50% (one copy) for a seamless loop when there are two copies stacked */
+@keyframes smooth-scroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.marqueee:hover .marqueee-content {
+  animation-play-state: paused;
+}
+
+/* Small-screen fallback: disable auto animation and make the box scrollable by user */
+@media (max-width: 480px) {
+  /* On narrow screens we enable a faster auto-scroll but keep hover/touch pause */
+  .marqueee {
+    max-height: 280px;
+    overflow: hidden; /* hide overflow while auto-scrolling */
+  }
+
+  /* slower loop for small viewports (was 18s - that's too fast on phones) */
+  .marqueee-content {
+    animation: smooth-scroll 36s linear infinite; /* doubled duration for better readability */
+  }
+
+  /* pause on hover or touch (useful for devices that provide hover) */
+  .marqueee:hover .marqueee-content,
+  .marqueee:active .marqueee-content {
+    animation-play-state: paused;
+  }
+
+  .charter,
+  .about-page {
+    padding: 12px;
+  }
+}
+
+/* --- Contact Section --- */
+.contact-banner {
+  font-size: 1.2rem;
+  width: 100%;
+  margin-top: 70px;
+}
+
+.div-main {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 80px;
+  flex-wrap: wrap;
+  margin-top: 40px;
+}
+
+.address {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.address-content {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.location-sw p {
+  font-size: 1.05rem;
+  line-height: 1.5rem;
+}
+
+.email-contact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.email-contact p {
+  margin: 0;
+  line-height: 1.5rem;
+  font-size: 1rem;
+}
+
+.image-div img {
+  width: 600px;
+  height: 300px;
+  border-radius: 10px;
+}
+
+/* --- Responsiveness --- */
+@media (min-width: 1024px) {
+  .div-main {
+    flex-wrap: nowrap;
+  }
+}
+
+@media (max-width: 1024px) {
+  .wrapper-about {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .about-page,
+  .charter {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .marqueee {
+    height: 300px;
+  }
+
+  .image-div img {
+    width: 400px;
+    height: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-page ul p {
+    font-size: 1.4rem;
+  }
+
+  .no-bullets li {
+    font-size: 0.95rem;
+  }
+
+  .marqueee {
+    height: 250px;
+  }
+
+  .image-div img {
+    width: 320px;
+    height: 240px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-page ul li p {
+    font-size: 0.95rem;
+    line-height: 1.6rem;
+  }
+
+  .no-bullets li {
+    font-size: 0.9rem;
+  }
+
+  .image-div img {
+    width: 260px;
+    height: 200px;
+  }
+
+  .email-contact {
+    gap: 6px;
+  }
+}
+
+@media only screen and (min-width: 1700px) {
+  .about-page ul p {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+
+  .about-page ul li p {
+    font-size: 1.4rem;
+    line-height: 2.1rem;
+    font-weight: 400;
+  }
+
+  .no-bullets li {
+    font-size: 1.4rem;
+    line-height: 2.2rem;
+  }
+
+  .marqueee {
+    height: 450px;
+  }
+
+  .image-div img {
+    width: 480px;
+    height: 340px;
+  }
+}

@@ -1,0 +1,101 @@
+.custom-navbar {
+    background-color: #85198e;
+}
+
+.custom-nav-image-wrapper {
+    height: 3.5rem;
+    margin: 0.1rem 1rem 0.1rem 1rem;
+}
+
+.custom-nav-image {
+    background: white;
+    height: 100%;
+    width: auto;
+}
+
+.custom-item-navbar {
+    margin: 0.7rem;
+    flex: 0 0 auto; /* Allow items to grow and take equal space */
+    white-space: nowrap; /* Prevent text from wrapping */
+    align-items: center;
+}
+
+/* Override Bootstrap nav-link styles */
+.nav-link {
+    color: #fff !important; /* Default color */
+    text-decoration: none; /* Remove underline */
+    display: block; /* Make the link a block element */
+    width: 100%; /* Make the link take the full width of the li */
+    text-align: center; /* Center the text */
+    padding: 10px; /* Add padding for better spacing */
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+.nav-link:active,
+.nav-link:focus {
+    color: #fff !important; /* Color when clicked or focused */
+}
+
+/* Optional: Remove the default Bootstrap hover effect */
+.nav-link:hover {
+    color: #0ff !important; /* Prevent Bootstrap hover color */
+    background-color: #8e1b98;
+}
+
+
+.navbar-toggler:focus {
+    outline: 2px solid white; /* Remove focus outline */
+}
+
+.custom-sidebar-container {
+    position: relative; /* Ensure this is set */
+    background-color: #333;
+}
+
+.custom-sidebar {
+    position: absolute; /* Corrected spelling */
+    height: 100vh; /* Full height minus navbar height */
+    top: 1px;
+    width: 100%; /* Adjust width as needed */
+    background-color: #85198e; /* Sidebar background color */
+    transform: translateX(-100%); /* Hidden by default */
+    transition: transform 0.3s ease; /* Smooth transition */
+    z-index: 1000; /* Ensure it's on top of other elements */
+}
+
+.custom-sidebar.open {
+    transform: translateX(0); /* Show when open */
+}
+
+/* Small mini-section near the logo beside the vertical divider */
+.mini-section-links {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: 0.25rem; /* keep it close to logo */
+}
+
+.mini-section-links .mini-left,
+.mini-section-links .mini-right {
+    color: #fff;
+    font-size: 1.05rem; /* increased size */
+    padding: 0 0.5rem; /* a bit more spacing */
+    text-decoration: none;
+    text-transform: uppercase; /* make only the mini title labels uppercase */
+    font-weight: 700; /* bold by default */
+}
+
+.mini-divider {
+    width: 1px;
+    background-color: rgba(255,255,255,0.95);
+    height: 30px;
+}
+
+.active-mini {
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+

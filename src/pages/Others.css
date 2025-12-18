@@ -1,0 +1,97 @@
+.Others{
+    margin-left: 290px;
+    margin-top: 110px;
+    margin-bottom: 10%;
+    background-color: white;
+    animation: fade-up 0.5s;
+}
+@keyframes fade-down {
+    0%{
+        opacity: 0;
+        transform: translateY(-30px) scale(0.9);
+    }
+    100%{
+        opacity: 1;
+        transform: translateY(0px) scale(1);
+    }
+  }
+  @keyframes fade-up {
+    0%{
+        opacity: 0;
+        transform: translateY(30px) scale(0.9);
+    }
+    100%{
+        opacity: 1;
+        transform: translateY(0px) scale(1);
+    }
+  }
+.hosetl-imagee-1 img{
+    width: 370px;
+    height: 350px;
+    
+}
+.hostel-imagee{
+    margin-top: 30px;
+}
+.sub-header p{
+    font-size: 1.5rem;
+}
+@media screen and (min-width:1700px){
+    .Others{
+        padding-left: 30px;
+        padding-right: 150px;
+    }
+    .hostel-paragraph .sub-header p{
+        font-size: 2.3rem;
+    }
+    .hosetl-imagee-1 img{
+        width: 370px;
+        height: 230px;
+    }
+    .hosetl-imagee-1 p{
+        font-size: 1.6rem;
+        margin-top: 20px;
+    }
+    .hostel-imagee{
+        gap: 30px;
+    }
+    .hostel-paragraph p{
+        font-size: 1.5rem;
+        line-height: 35px;
+    }
+    .image-block img{
+        width: 450px;
+        height: 350px;
+       
+    }
+}
+@media screen and (max-width:1024px){
+    .Others{
+        margin-left: 10px;
+        margin-right: 10px;
+        margin-top: 110px;
+        margin-bottom: 30%;
+        width: 100%;
+    }
+    .hosetl-imagee-1 img{
+        margin-top: 15px;
+        width: 250px;
+        height: 200px;
+    }
+    .hosetl-imagee-1{
+        margin-bottom: 15px;
+    }
+    .wellness-header{
+        padding-left: 10px;
+    }
+    .sub-header p {
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+    .hostel-imagee{
+        margin-top: 10px;
+    }
+    .o-y{
+        font-size: 1rem;
+    }
+}

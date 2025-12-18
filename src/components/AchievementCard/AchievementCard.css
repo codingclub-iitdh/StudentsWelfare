@@ -1,0 +1,213 @@
+.achievement-card {
+  background: white;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border-top: 4px solid #86198f;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.achievement-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(134, 25, 143, 0.02) 0%,
+    rgba(134, 25, 143, 0.05) 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.achievement-card.gold {
+  border-top-color: #ffc107;
+}
+
+.achievement-card.silver {
+  border-top-color: #c0c0c0;
+}
+
+.achievement-card.bronze {
+  border-top-color: #cd7f32;
+}
+
+/* Card Images */
+.card-images {
+  width: 100%;
+  padding: 15px;
+  background: #fafafa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Card Icon */
+.card-icon {
+  font-size: 2.5rem;
+  margin: 15px 0 10px 0;
+  padding: 0 30px;
+  transition: transform 0.3s ease;
+}
+
+.achievement-card.gold .card-icon {
+  color: #ffc107;
+}
+
+.achievement-card.silver .card-icon {
+  color: #c0c0c0;
+}
+
+.achievement-card.bronze .card-icon {
+  color: #cd7f32;
+}
+
+.achievement-card:hover .card-icon {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+/* Card Content */
+.card-content {
+  position: relative;
+  z-index: 1;
+  flex-grow: 1;
+  padding: 0 30px 30px;
+}
+
+.achievement-event {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.achievement-subtitle-text {
+  font-size: 0.95rem;
+  color: #86198f;
+  font-weight: 600;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Meta Information */
+.achievement-meta {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.placement-badge,
+.year-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.placement-badge {
+  background-color: #ffe5f0;
+  color: #86198f;
+}
+
+.year-badge {
+  background-color: #f0e5ff;
+  color: #6b21a8;
+}
+
+/* Description */
+.achievement-description {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #555;
+  margin-top: 15px;
+}
+
+/* Card Accent */
+.card-accent {
+  position: absolute;
+  bottom: -30px;
+  right: -30px;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(
+    circle,
+    rgba(134, 25, 143, 0.1) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .achievement-card {
+    padding: 0;
+  }
+
+  .card-images {
+    padding: 10px;
+  }
+
+  .card-icon {
+    font-size: 2rem;
+    margin: 12px 0 8px 0;
+    padding: 0 20px;
+  }
+
+  .card-content {
+    padding: 0 20px 20px;
+  }
+
+  .achievement-event {
+    font-size: 1.3rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .card-icon {
+    font-size: 1.8rem;
+    margin: 10px 0 5px 0;
+    padding: 0 15px;
+  }
+
+  .card-content {
+    padding: 0 15px 20px;
+  }
+
+  .achievement-event {
+    font-size: 1.1rem;
+  }
+
+  .achievement-meta {
+    flex-direction: column;
+  }
+
+  .placement-badge,
+  .year-badge {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media screen and (min-width: 1700px) {
+  .achievement-card {
+    padding: 0;
+  }
+
+  .card-icon {
+    font-size: 3rem;
+  }
+
+  .card-content {
+    padding: 0 40px 40px;
+  }
+}

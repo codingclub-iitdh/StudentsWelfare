@@ -1,0 +1,8 @@
+
+.f-b-r{
+    background-color: #a21caf;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+}

@@ -1,0 +1,60 @@
+/* src/BootstrapCard.css */
+.card {
+  margin: 20px auto; /* Center the card */
+  padding:10px;
+/*   background: rgba(255, 0, 0, 1); */
+  background: rgba(50, 100, 255, 0.2);
+  height: 80%;
+  width: 80%;
+  border: none;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5);
+  transition: 0.5s, box-shadow 0.5s;
+}
+
+.card:hover {
+  /* transform: translateY(-3px); /* Lift up effect */
+  /* box-shadow: 0 6px 6px rgba(0, 0, 0, 0.5); /* Shadow effect */
+  background: rgba(0, 100, 200, 0.3);
+  transition: 0.5s;
+}
+
+.card-img-top {
+  width: 100px; /* Set width for the circular image */
+  height: 100px; /* Set height for the circular image */
+  object-fit: cover; /* Ensure the image covers the area */
+  margin: 0 auto; /* Center the image */
+}
+
+.card-name {
+  color: blue; /* Set name color to blue */
+  margin: 10px -10px 5px -10px; /* Add margin for spacing */
+}
+
+.card-title {
+  color: black; /* Set title color to black */
+  margin: 0; /* Remove default margin */
+}
+
+.hover-card {
+  position: absolute; /* Position it relative to the card */
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  width: 90%; /* Set width for the hover card */
+  z-index: 10; /* Ensure it appears above other elements */
+  top: 95%; /* Adjust position as needed */
+  left: 50%; /* Center it horizontally */
+  transform: translateX(-50%); /* Center it */
+  opacity: 0; /* Start hidden */
+  transition: opacity 0.3s ease; /* Fade animation */
+}
+
+.card:hover .hover-card,
+.card.active .hover-card {
+  opacity: 1; /* Fade in when the card is hovered or active */
+}
+
+
+
+
