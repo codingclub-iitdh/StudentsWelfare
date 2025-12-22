@@ -51,25 +51,26 @@
   color: #333;
 }
 
-/* Grid Layout - Responsive 3-column max, fills row */
+/* Grid Layout - Masonry / Tetris style */
 .achievements-grid {
   display: flex;
-  flex-wrap: wrap;
   gap: 25px;
   margin-bottom: 50px;
-  align-items: stretch;
+  align-items: flex-start;
 }
 
-.achievements-grid > * {
-  flex: 1 1 400px;
-  min-width: 300px;
+.achievements-column {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  flex: 1;
+  min-width: 0;
 }
 
-/* On small screens, 1 per row */
+/* Responsive adjustments */
 @media screen and (max-width: 768px) {
-  .achievements-grid > * {
-    flex: 1 1 100%;
-    min-width: 100%;
+  .achievements-grid {
+    gap: 20px;
   }
 }
 

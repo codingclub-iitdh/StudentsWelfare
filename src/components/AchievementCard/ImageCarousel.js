@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaImage } from "react-icons/fa";
 import "./ImageCarousel.css";
 
 const ImageCarousel = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [imageLoaded, setImageLoaded] = useState({});
+  const [imageError, setImageError] = useState({});
 
   if (!images || images.length === 0) {
     return (
@@ -13,6 +15,14 @@ const ImageCarousel = ({ images }) => {
       </div>
     );
   }
+
+  const handleImageLoad = (index) => {
+    setImageLoaded((prev) => ({ ...prev, [index]: true }));
+  };
+
+  const handleImageError = (index) => {
+    setImageError((prev) => ({ ...prev, [index]: true }));
+  };
 
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) =>
@@ -37,16 +47,32 @@ const ImageCarousel = ({ images }) => {
       {/* Main Carousel */}
       <div className="carousel-main">
         <AnimatePresence mode="wait">
-          <motion.img
-            key={currentIndex}
-            src={currentImage.src}
-            alt={currentImage.alt}
-            className="carousel-image"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-          />
+          {imageError[currentIndex] ? (
+            <div className="image-error-placeholder" key={`error-${currentIndex}`}>
+              <FaImage className="error-icon" />
+              <p>Image unavailable</p>
+            </div>
+          ) : (
+            <>
+              {!imageLoaded[currentIndex] && (
+                <div className="image-loading-placeholder">
+                  <div className="loading-spinner"></div>
+                </div>
+              )}
+              <motion.img
+                key={currentIndex}
+                src={currentImage.src}
+                alt={currentImage.alt || "Achievement image"}
+                className={`carousel-image ${imageLoaded[currentIndex] ? 'loaded' : 'loading'}`}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: imageLoaded[currentIndex] ? 1 : 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+                onLoad={() => handleImageLoad(currentIndex)}
+                onError={() => handleImageError(currentIndex)}
+              />
+            </>
+          )}
         </AnimatePresence>
 
         {/* Navigation Arrows */}
