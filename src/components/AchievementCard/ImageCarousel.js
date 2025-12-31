@@ -82,7 +82,10 @@ const ImageCarousel = ({ images }) => {
       >
         <AnimatePresence mode="wait">
           {imageError[currentIndex] ? (
-            <div className="image-error-placeholder" key={`error-${currentIndex}`}>
+            <div
+              className="image-error-placeholder"
+              key={`error-${currentIndex}`}
+            >
               <FaImage className="error-icon" />
               <p>Image unavailable</p>
             </div>
@@ -97,9 +100,14 @@ const ImageCarousel = ({ images }) => {
                 key={currentIndex}
                 src={currentImage.src}
                 alt={currentImage.alt || "Achievement image"}
-                className={`carousel-image ${imageLoaded[currentIndex] ? 'loaded' : 'loading'}`}
+                className={`carousel-image ${
+                  imageLoaded[currentIndex] ? "loaded" : "loading"
+                }`}
                 initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: imageLoaded[currentIndex] ? 1 : 0, scale: 1 }}
+                animate={{
+                  opacity: imageLoaded[currentIndex] ? 1 : 0,
+                  scale: 1,
+                }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.3 }}
                 onLoad={(e) => handleImageLoad(currentIndex, e)}
