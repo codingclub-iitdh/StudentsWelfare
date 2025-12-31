@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaChevronLeft, FaChevronRight, FaImage } from "react-icons/fa";
 import "./ImageCarousel.css";
@@ -7,7 +7,32 @@ const ImageCarousel = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [imageLoaded, setImageLoaded] = useState({});
   const [imageError, setImageError] = useState({});
+  const [imageDimensions, setImageDimensions] = useState({});
+  const [containerHeight, setContainerHeight] = useState(null);
+  const containerRef = useRef(null);
 
+  // Calculate the max height based on all loaded images
+  // This ensures the container is sized to the tallest image
+  useEffect(() => {
+    if (Object.keys(imageDimensions).length > 0 && containerRef.current) {
+      const containerWidth = containerRef.current.offsetWidth;
+      let maxHeight = 0;
+
+      Object.values(imageDimensions).forEach((dim) => {
+        // Calculate what height this image would be at container width
+        const scaledHeight = (dim.height / dim.width) * containerWidth;
+        if (scaledHeight > maxHeight) {
+          maxHeight = scaledHeight;
+        }
+      });
+
+      // Cap the max height to prevent extremely tall containers
+      const cappedHeight = Math.min(maxHeight, 600);
+      setContainerHeight(cappedHeight > 0 ? cappedHeight : null);
+    }
+  }, [imageDimensions]);
+
+  // Early return for no images - must be after all hooks
   if (!images || images.length === 0) {
     return (
       <div className="no-images">
@@ -16,7 +41,12 @@ const ImageCarousel = ({ images }) => {
     );
   }
 
-  const handleImageLoad = (index) => {
+  const handleImageLoad = (index, event) => {
+    const { naturalWidth, naturalHeight } = event.target;
+    setImageDimensions((prev) => ({
+      ...prev,
+      [index]: { width: naturalWidth, height: naturalHeight },
+    }));
     setImageLoaded((prev) => ({ ...prev, [index]: true }));
   };
 
@@ -45,7 +75,11 @@ const ImageCarousel = ({ images }) => {
   return (
     <div className="image-carousel-wrapper">
       {/* Main Carousel */}
-      <div className="carousel-main">
+      <div
+        className="carousel-main"
+        ref={containerRef}
+        style={containerHeight ? { height: `${containerHeight}px` } : {}}
+      >
         <AnimatePresence mode="wait">
           {imageError[currentIndex] ? (
             <div className="image-error-placeholder" key={`error-${currentIndex}`}>
@@ -68,7 +102,7 @@ const ImageCarousel = ({ images }) => {
                 animate={{ opacity: imageLoaded[currentIndex] ? 1 : 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.3 }}
-                onLoad={() => handleImageLoad(currentIndex)}
+                onLoad={(e) => handleImageLoad(currentIndex, e)}
                 onError={() => handleImageError(currentIndex)}
               />
             </>

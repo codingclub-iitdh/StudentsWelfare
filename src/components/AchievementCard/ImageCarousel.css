@@ -7,8 +7,8 @@
   position: relative;
   width: 100%;
   overflow: hidden;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -16,14 +16,15 @@
 }
 
 .carousel-image {
-  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
   height: auto;
   display: block;
   object-fit: contain;
   object-position: center;
-  max-height: 450px;
-  border-radius: 8px;
   background: transparent;
+  margin: 0 auto;
 }
 
 .carousel-image.loading {
@@ -38,12 +39,12 @@
 /* Loading Placeholder */
 .image-loading-placeholder {
   width: 100%;
-  min-height: 200px;
+  min-height: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
-  border-radius: 8px;
+  border-radius: 8px 8px 0 0;
 }
 
 .loading-spinner {
@@ -64,13 +65,13 @@
 /* Error Placeholder */
 .image-error-placeholder {
   width: 100%;
-  min-height: 200px;
+  min-height: 150px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
-  border-radius: 8px;
+  border-radius: 8px 8px 0 0;
   color: #999;
 }
 
@@ -186,8 +187,13 @@
 
 /* Responsive Design */
 @media screen and (max-width: 1024px) {
+  .carousel-main {
+    min-height: 180px;
+  }
+
   .carousel-image {
-    max-height: 380px;
+    max-width: 100%;
+    max-height: 100%;
   }
 
   .carousel-nav {
@@ -206,8 +212,13 @@
 }
 
 @media screen and (max-width: 768px) {
+  .carousel-main {
+    min-height: 160px;
+  }
+
   .carousel-image {
-    max-height: 320px;
+    max-width: 100%;
+    max-height: 100%;
   }
 
   .carousel-nav {
@@ -239,14 +250,19 @@
 }
 
 @media screen and (max-width: 480px) {
+  .carousel-main {
+    min-height: 150px;
+  }
+
   .carousel-image {
-    max-height: 260px;
+    max-width: 100%;
+    max-height: 100%;
   }
 
   .carousel-nav {
-    width: 30px;
-    height: 30px;
-    font-size: 0.75rem;
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
   }
 
   .carousel-nav-prev {
@@ -260,8 +276,8 @@
   .carousel-counter {
     bottom: 6px;
     right: 6px;
-    font-size: 0.65rem;
-    padding: 2px 8px;
+    font-size: 0.7rem;
+    padding: 3px 8px;
   }
 
   .carousel-dots {

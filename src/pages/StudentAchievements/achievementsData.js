@@ -106,7 +106,17 @@ const achievementsData = [
   placement: "Finalists",
   year: 2025,
   description:
-    "A team from the institute, led by Samarth M, qualified for the finals of the CSAW Embedded Security Challenge 2025. The competition is internationally recognized for its rigorous focus on embedded systems security, hardware exploitation, and low-level system analysis, highlighting the team’s strong technical depth and problem-solving capabilities.",
+    "A team from the institute qualified for the finals of the CSAW Embedded Security Challenge 2025, an internationally recognized embedded security competition organized by NYU.\n\n" +
+    "🛡️ Team Members:\n" +
+    "• Nidhish Doshi (Team Lead)\n" +
+    "• Aaditya Kumar\n" +
+    "• Piyush Singh\n" +
+    "• Arjun Gangwar\n\n" +
+    "📋 Competition Format:\n" +
+    "The challenge focused on embedded systems security with two rounds:\n\n" +
+    "Round 1 (Qualification): Teams submitted a technical paper explaining their approach to solving a specific problem using side-channel data analysis.\n\n" +
+    "Finals: Teams worked hands-on with the ChipWhisperer Nano board, implementing side-channel attacks and fault injection attacks to exploit hardware vulnerabilities.\n\n" +
+    "🔗 More details: github.com/TrustworthyComputing/csaw_esc_2025",
   icon: "FaShieldAlt",
   color: "teal",
 }
