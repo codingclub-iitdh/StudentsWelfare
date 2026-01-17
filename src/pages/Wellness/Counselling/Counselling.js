@@ -50,12 +50,6 @@ function Counselling() {
         />
       </div>
 
-      <div className="mt-5 custom-content text-start fs-4">
-        <p>
-          <b>Mental Health is as important as Physical Health</b>
-        </p>
-      </div>
-
       <div className="custom-content text-start mt-5 fs-4">
         <p>
           The Counselling Center at IIT DHARWAD provides assistance and
@@ -71,19 +65,27 @@ function Counselling() {
         </p>
       </div>
 
-      <div className="mt-5 custom-content text-start fs-4">
+      <div className="d-flex flex-column align-items-center mt-5 mb-4">
+        <p
+          style={{
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+            marginBottom: "1rem",
+            color: "#4338ca",
+          }}
+        >
+          Mental Health is as important as Physical Health
+        </p>
         <a
           href="https://drive.google.com/file/d/1J7glzRl_Z1cnnlN_VD3iblRfbGgQAd_S/view?usp=drivesdk"
           target="_blank"
           rel="noopener noreferrer"
           style={{
-            marginTop: "20px",
             fontSize: "1.3rem",
             fontStyle: "italic",
             color: "#4338ca",
             fontWeight: "500",
             textDecoration: "none",
-            display: "block",
           }}
         >
           Orientation presentation by TalkToAngel
@@ -93,7 +95,8 @@ function Counselling() {
             marginTop: "15px",
             marginBottom: "30px",
             aspectRatio: "16/9",
-            maxWidth: "800px",
+            maxWidth: "1000px",
+            width: "90%",
           }}
         >
           <iframe
