@@ -108,7 +108,7 @@ const achievementsData = [
     description:
       "A team from the institute qualified for the finals of the CSAW Embedded Security Challenge 2025, an internationally recognized embedded security competition organized by NYU.\n\n" +
       "🛡️ Team Members:\n" +
-      "• Nidhish Doshi (Team Lead)\n" +
+      "• Samarth M (Team Lead)\n" +
       "• Aaditya Kumar\n" +
       "• Piyush Singh\n" +
       "• Arjun Gangwar\n\n" +

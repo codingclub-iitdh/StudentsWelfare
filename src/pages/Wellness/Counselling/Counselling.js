@@ -4,13 +4,14 @@ import Scrollevent from "../../Scrollerevent";
 import "./Counselling.css";
 import { motion } from "framer-motion";
 
-import yd from "../../../images/yourdost.png";
+import tta from "../../../images/talktoangel.png";
 import te from "../../../images/tele-manas-mental-health-service1.jpg";
 import karuneMainLogo from "../../../images/counselling-centre/karune-main-logo.png";
 
 import mentorsData from "./CounsellingMentorsData.js";
 
 import RajshekarK from "../../../images/faculty/rajshekar-k.jpg";
+import SavitaBasavarajAngadi from "../../../images/counselling-centre/savita-basavaraj-angadi.png"
 import PradeepYammiyavar from "../../../images/faculty/pradeep-yammiyavar.jpg";
 import RidhimaTewari from "../../../images/faculty/ridhima-tewari.jpg";
 import VijayalakshmiPeri from "../../../images/counselling-centre/vijayalakshmi-peri.jpg";
@@ -117,40 +118,24 @@ function Counselling() {
       </div>
 
       <div className="row g-3 d-flex align-items-stretch">
-        {/* YourDOST Card */}
-        <div className="col-lg-6">
-          <div className="card w-100 h-100 p-3">
-            <img
-              src={yd}
-              alt="YourDOST"
-              className="card-img-top"
-              style={{ width: "50%", height: "auto" }}
-            />
-            <div className="card-body">
-              <h5 className="card-title fs-4">
-                <a
-                  href="https://www.iitdh.ac.in/sites/default/files/2023-10/YourDOST_steps_2023_07_19.pdf"
-                  className="text-decoration-none"
-                >
-                  YourDOST
-                </a>
-              </h5>
-              <br />
-              <p className="card-text fs-5">
-                IIT Dharwad in cooperation with YourDOST -- a professional
-                online counselling service, provides a direct link to anyone at
-                IIT Dharwad to contact them and seek their services without any
-                charge.
-              </p>
-              <a
-                href="https://www.iitdh.ac.in/sites/default/files/2023-10/YourDOST_steps_2023_07_19.pdf"
-                className="btn btn-primary"
-              >
-                Connect With YourDOST
-              </a>
-            </div>
-          </div>
-        </div>
+                {/* TalkToAngel Card */}
+                <div className="col-lg-6">
+                    <div className="card w-100 h-100 p-3">
+                        <img src={tta} alt="TalkToAngel" className="card-img-top" style={{ width: '50%', height: 'auto' }}/>
+                        <div className="card-body">
+                            <h5 className="card-title fs-4">
+                                <a href="/documents/IITDh-online-counselling-talk-to-angel-instructions.pdf" className="text-decoration-none">
+                                    Talk To Angel
+                                </a>
+                            </h5>
+                            <br/>
+                            <p className="card-text fs-5">
+                                IIT Dharwad in cooperation with TalkToAngel -- a professional online counselling service, provides a direct link to anyone at IIT Dharwad to contact them and seek their services without any charge.
+                            </p>
+                            <a href="/documents/IITDh-online-counselling-talk-to-angel-instructions.pdf" className="btn btn-primary">Connect With TalkToAngel</a>
+                        </div>
+                    </div>
+                </div>
 
         {/* TeleMANAS Card */}
         <div className="col-lg-6">
@@ -258,17 +243,18 @@ function Counselling() {
             />
           </div>
           <div className="col-lg-3 col-md-6">
-            <BootstrapCard
-              image={VijayalakshmiPeri}
-              name="Vijayalakshmi Peri"
-              title="M.A. Counselling Psychology, Counselling Psychologist"
-              moreInfoHTML={`
+                        <BootstrapCard
+                            image={SavitaBasavarajAngadi}
+                            name="Savita Basavaraj Angadi"
+                            title="Masters in Psychology, Counselling Psychologist"
+                            moreInfoHTML={`
                                 <b> More Info </b> <br>
-                                <a href='https://yourdost.com/auth/sign-in?serviceId=1&next=https:%2F%2Fyourdost.com%2Fin-person-counselling%2Ff2f%2Fiitdh'>Book an appointment</a>
+                                <a href='https://www.talktoangel.com/iit-dharwad/login'>Book an appointment</a> <br>
+                                <a href='/documents/savita-basavaraj-angadi-profile.pdf'>Profile</a>
                             `}
-              email="mailto:counselor2.karuna@iitdh.ac.in"
-            />
-          </div>
+                            email="mailto:counselor2.karuna@iitdh.ac.in"
+                        />
+                    </div>
           <div className="col-lg-3 col-md-6">
             <BootstrapCard
               image={DarshanaKishoreGandhi}
