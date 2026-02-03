@@ -11,7 +11,7 @@ import karuneMainLogo from "../../../images/counselling-centre/karune-main-logo.
 import mentorsData from "./CounsellingMentorsData.js";
 
 import RajshekarK from "../../../images/faculty/rajshekar-k.jpg";
-import SavitaBasavarajAngadi from "../../../images/counselling-centre/savita-basavaraj-angadi.png"
+import SavitaBasavarajAngadi from "../../../images/counselling-centre/savita-basavaraj-angadi.png";
 import PradeepYammiyavar from "../../../images/faculty/pradeep-yammiyavar.jpg";
 import RidhimaTewari from "../../../images/faculty/ridhima-tewari.jpg";
 import VijayalakshmiPeri from "../../../images/counselling-centre/vijayalakshmi-peri.jpg";
@@ -118,24 +118,40 @@ function Counselling() {
       </div>
 
       <div className="row g-3 d-flex align-items-stretch">
-                {/* TalkToAngel Card */}
-                <div className="col-lg-6">
-                    <div className="card w-100 h-100 p-3">
-                        <img src={tta} alt="TalkToAngel" className="card-img-top" style={{ width: '50%', height: 'auto' }}/>
-                        <div className="card-body">
-                            <h5 className="card-title fs-4">
-                                <a href="/documents/IITDh-online-counselling-talk-to-angel-instructions.pdf" className="text-decoration-none">
-                                    Talk To Angel
-                                </a>
-                            </h5>
-                            <br/>
-                            <p className="card-text fs-5">
-                                IIT Dharwad in cooperation with TalkToAngel -- a professional online counselling service, provides a direct link to anyone at IIT Dharwad to contact them and seek their services without any charge.
-                            </p>
-                            <a href="/documents/IITDh-online-counselling-talk-to-angel-instructions.pdf" className="btn btn-primary">Connect With TalkToAngel</a>
-                        </div>
-                    </div>
-                </div>
+        {/* TalkToAngel Card */}
+        <div className="col-lg-6">
+          <div className="card w-100 h-100 p-3">
+            <img
+              src={tta}
+              alt="TalkToAngel"
+              className="card-img-top"
+              style={{ width: "50%", height: "auto" }}
+            />
+            <div className="card-body">
+              <h5 className="card-title fs-4">
+                <a
+                  href="/documents/IITDh-online-counselling-talk-to-angel-instructions.pdf"
+                  className="text-decoration-none"
+                >
+                  Talk To Angel
+                </a>
+              </h5>
+              <br />
+              <p className="card-text fs-5">
+                IIT Dharwad in cooperation with TalkToAngel -- a professional
+                online counselling service, provides a direct link to anyone at
+                IIT Dharwad to contact them and seek their services without any
+                charge.
+              </p>
+              <a
+                href="/documents/IITDh-online-counselling-talk-to-angel-instructions.pdf"
+                className="btn btn-primary"
+              >
+                Connect With TalkToAngel
+              </a>
+            </div>
+          </div>
+        </div>
 
         {/* TeleMANAS Card */}
         <div className="col-lg-6">
@@ -229,6 +245,7 @@ function Counselling() {
 
       <div className="rounded custom-important-container">
         <div className="row justify-content-center">
+          {/* Prof. Pradeep Yammiyavar - Hidden (not available this semester)
           <div className="col-lg-3 col-md-6">
             <BootstrapCard
               image={PradeepYammiyavar}
@@ -242,19 +259,20 @@ function Counselling() {
               email="mailto:counselor1.karuna@iitdh.ac.in"
             />
           </div>
+          */}
           <div className="col-lg-3 col-md-6">
-                        <BootstrapCard
-                            image={SavitaBasavarajAngadi}
-                            name="Savita Basavaraj Angadi"
-                            title="Masters in Psychology, Counselling Psychologist"
-                            moreInfoHTML={`
+            <BootstrapCard
+              image={SavitaBasavarajAngadi}
+              name="Savita Basavaraj Angadi"
+              title="Masters in Psychology, Counselling Psychologist"
+              moreInfoHTML={`
                                 <b> More Info </b> <br>
                                 <a href='https://www.talktoangel.com/iit-dharwad/login'>Book an appointment</a> <br>
                                 <a href='/documents/savita-basavaraj-angadi-profile.pdf'>Profile</a>
                             `}
-                            email="mailto:counselor2.karuna@iitdh.ac.in"
-                        />
-                    </div>
+              email="mailto:counselor2.karuna@iitdh.ac.in"
+            />
+          </div>
           <div className="col-lg-3 col-md-6">
             <BootstrapCard
               image={DarshanaKishoreGandhi}

@@ -43,6 +43,7 @@ const Sidebar = ({ children }) => {
     { path: "/hostels", label: "Hostels" },
     { path: "/mess_canteen", label: "Mess & Canteen" },
     { path: "/gymkhana", label: "Gymkhana" },
+    { path: "/swimming-pool", label: "Swimming Pool" },
   ];
 
   // wellness-specific links will be added to `wellnessLinks` so they show only under wellness

@@ -14,10 +14,11 @@
 }
 
 .custom-item-navbar {
-    margin: 0.7rem;
-    flex: 0 0 auto; /* Allow items to grow and take equal space */
-    white-space: nowrap; /* Prevent text from wrapping */
+    margin: 0.5rem 0.3rem;
+    flex: 0 0 auto;
+    white-space: nowrap;
     align-items: center;
+    padding-right: 0.3rem;
 }
 
 /* Override Bootstrap nav-link styles */
@@ -80,11 +81,12 @@
 .mini-section-links .mini-left,
 .mini-section-links .mini-right {
     color: #fff;
-    font-size: 1.05rem; /* increased size */
-    padding: 0 0.5rem; /* a bit more spacing */
+    font-size: 0.95rem;
+    padding: 0 0.75rem;
     text-decoration: none;
-    text-transform: uppercase; /* make only the mini title labels uppercase */
-    font-weight: 700; /* bold by default */
+    text-transform: uppercase;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 .mini-divider {

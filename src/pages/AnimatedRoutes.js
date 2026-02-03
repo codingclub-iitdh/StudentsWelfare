@@ -8,6 +8,7 @@ import AdministrativeOffice from "./AdministrativeOffice/AdministrativeOffice.js
 import Hostels from "./Hostels/Hostels.js";
 import MessAndCanteen from "./MessAndCanteen/MessAndCanteen.js";
 import Gymkhana from "./Gymkhana/Gymkhana.js";
+import SwimmingPool from "./SwimmingPool/SwimmingPool.js";
 import GoToTop from "./GoToTop.js";
 import StudentCampusLife from "./StudentCampusLife/StudentCampusLife.js";
 import Health from "./Wellness/Health/Health.js";
@@ -57,6 +58,7 @@ export default function AnimatedRoutes() {
           <Route path="/hostels" element={<Hostels />} />
           <Route path="/mess_canteen" element={<MessAndCanteen />} />
           <Route path="/gymkhana" element={<Gymkhana />} />
+          <Route path="/swimming-pool" element={<SwimmingPool />} />
           <Route path="/student_life" element={<StudentCampusLife />} />
           <Route
             path="/student_achievements"
