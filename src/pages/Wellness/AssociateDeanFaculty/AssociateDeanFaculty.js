@@ -46,7 +46,7 @@ function AssociateDeanFaculty() {
                 email="mailto:fic.counselling@iitdh.ac.in"
               />
             </div>
-            {/* <div className="col-lg-4 col-md-6">
+            <div className="col-lg-4 col-md-6">
               <BootstrapCard
                 image={PradeepYammiyavar}
                 name="Prof. Pradeep Yammiyavar"
@@ -54,7 +54,7 @@ function AssociateDeanFaculty() {
                 moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/pradeep-gururaj-yammiyavar'>Prof. Pradeep Yammiyavar's Homepage</a>"
                 email="mailto:fic.counselling@iitdh.ac.in"
               />
-            </div> */}
+            </div>
           </div>
         </div>
       </div>
