@@ -12,26 +12,25 @@ import img6 from "../../images/SwimmingPool/IMG20260201174350.jpg.jpeg";
 
 export default function SwimmingPool() {
   const weekdaySlots = [
-    { time: "6:30 AM – 7:15 AM", category: "Boys" },
-    { time: "7:20 AM – 8:05 AM", category: "Boys" },
-    { time: "8:10 AM – 8:55 AM", category: "Girls" },
-    { time: "4:00 PM – 4:45 PM", category: "Girls" },
+    { time: "6:15 AM – 6:55 AM", category: "Girls" },
+    { time: "7:00 AM – 7:40 AM", category: "Boys" },
+    { time: "7:45 AM – 8:25 AM", category: "Boys" },
+    { time: "4:00 PM – 4:40 PM", category: "Boys" },
     {
-      time: "4:50 PM – 5:35 PM",
-      category: "Boys (every Wednesday for Faculty and staff families)",
+      time: "4:55 PM – 5:35 PM",
+      category: "Girls",
     },
-    { time: "5:40 PM – 6:25 PM", category: "Boys" },
+    { time: "5:50 PM – 6:30 PM", category: "Boys" },
   ];
 
   const weekendSlots = [
     { time: "7:00 AM – 7:45 AM", category: "Boys" },
-    { time: "7:50 AM – 8:35 AM", category: "Boys" },
-    { time: "8:40 AM – 9:25 AM", category: "Girls" },
-    { time: "9:30 AM – 10:30 AM", category: "Faculty and staff families" },
-    { time: "3:00 PM – 3:45 PM", category: "Girls" },
-    { time: "3:50 PM – 4:35 PM", category: "Boys" },
-    { time: "4:40 PM – 5:25 PM", category: "Boys" },
-    { time: "5:30 PM – 6:15 PM", category: "Boys" },
+    { time: "7:45 AM – 8:25 AM", category: "Boys" },
+    { time: "8:30 AM – 9:10 AM", category: "Girls" },
+    { time: "3:15 PM – 3:55 PM", category: "Boys" },
+    { time: "4:00 PM – 4:40 PM", category: "Boys" },
+    { time: "4:55 PM – 5:35 PM", category: "Girls" },
+    { time: "5:50 PM – 6:30 PM", category: "Boys" },
   ];
 
   const documents = [
@@ -194,7 +193,7 @@ export default function SwimmingPool() {
                     </tr>
                   </thead>
                   <tbody>
-                    {weekendSlots.slice(0, 4).map((slot, index) => (
+                    {weekendSlots.slice(0, 3).map((slot, index) => (
                       <tr key={index}>
                         <td>{slot.time}</td>
                         <td>{slot.category}</td>
@@ -214,7 +213,7 @@ export default function SwimmingPool() {
                     </tr>
                   </thead>
                   <tbody>
-                    {weekendSlots.slice(4).map((slot, index) => (
+                    {weekendSlots.slice(3).map((slot, index) => (
                       <tr key={index}>
                         <td>{slot.time}</td>
                         <td>{slot.category}</td>

@@ -18,6 +18,14 @@ function WellnessHome() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
+      {/* ===== Contact Number Marquee ===== */}
+      <div className="contact-marquee">
+        <Marquee direction="left" speed={60} pauseOnHover={true} gradient={false}>
+          <div className="contact-chip">Wellness Center Mobile: +91 81474 03386</div>
+          <div className="contact-chip">Ambulance: +91 89715 23447</div>
+          <div className="contact-chip">Wellness Centre Landline: 083623 09644</div>
+        </Marquee>
+      </div>
       {/* ===== Top Image Marquee ===== */}
       <div className="App">
         <Marquee direction="left" speed={100} pauseOnHover={true}>
