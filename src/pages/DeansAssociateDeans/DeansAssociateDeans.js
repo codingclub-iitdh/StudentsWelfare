@@ -6,6 +6,7 @@ import RamjeeRepaka from '../../images/faculty/ramjee-repaka.jpeg';
 import RPrabhu from '../../images/faculty/r-prabhu.jpg';
 import SuryaPrakashRamesh from '../../images/faculty/surya-prakash-ramesh.jpg';
 import SuryaPratapSingh from '../../images/faculty/surya-pratap-singh.jpeg';
+import RumaGhosh from '../../images/faculty/ruma-ghosh.jpg';
 import RajeshwaraRao from '../../images/faculty/rajeshwara-rao.jpg';
 import RidhimaTewari from '../../images/faculty/ridhima-tewari.jpg';
 import { motion } from 'framer-motion';
@@ -62,10 +63,10 @@ export default function DeansAssociateDeans() {
                     </div>
                     <div className="col-lg-3 col-md-6">
                         <BootstrapCard
-                            image={SuryaPratapSingh}
-                            name="Prof. Surya Pratap Singh"
+                            image={RumaGhosh}
+                            name="Prof. Ruma Ghosh"
                             title="Associate Dean - Hostel and Mess"
-                            moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/surya-pratap-singh'>Prof. Surya Pratap Singh's Homepage</a>"
+                            moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/ruma-ghosh'>Prof. Ruma Ghosh's Homepage</a>"
                             email="mailto:adean.sw.hostel@iitdh.ac.in"
                         />
                     </div>
@@ -78,15 +79,7 @@ export default function DeansAssociateDeans() {
                             email="mailto:adean.sw.gymkhana@iitdh.ac.in"
                         />
                     </div>
-                    <div className="col-lg-3 col-md-6">
-                        <BootstrapCard
-                            image={RidhimaTewari}
-                            name="Prof. Ridhima Tewari"
-                            title="Associate Dean - Wellness & Female Students"
-                            moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/ridhima-tewari'>Prof. Ridhima Tewari's Homepage</a>"
-                            email="mailto:adean.sww@iitdh.ac.in"
-                        />
-                    </div>
+                    
                 </div>
             </div>
         </motion.div>

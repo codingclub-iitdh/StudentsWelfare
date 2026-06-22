@@ -2,10 +2,9 @@ import React from 'react';
 import './AdministrativeOffice.css';
 import BootstrapCard from '../../components/Cards/BootstrapCard'; // Import your BootstrapCard component
 import RamjeeRepaka from '../../images/faculty/ramjee-repaka.jpeg';
-import RPrabhu from '../../images/faculty/r-prabhu.jpg';
 import ArunVerma from "../../images/staff/arun-verma.jpg";
+import ChetanTotad from "../../images/staff/Chetan Basavaraj Totad_0.jpg";
 import AmolDiwate from '../../images/staff/amol-diwate.jpg';
-import Avinash from "../../images/staff/avinash-b.jpg";
 import JanardhanReddy from '../../images/staff/janardhan-reddy-s.jpg';
 import { motion } from 'framer-motion';
 
@@ -38,27 +37,16 @@ export default function AdministrativeOffice() {
             </div>
 
             <div className='row rounded p-2 justify-content-center custom-important-container'>
-                <div className="col-md-3">
-                </div>
-                <div className="col-md-3">
-                    <BootstrapCard
-                        image={RPrabhu}
-                        name="Prof. R Prabhu"
-                        title="Dean, Student Welfare"
-                        moreInfoHTML="<a href='https://iitdh.ac.in/user-profile/r-prabhu'>Prof. R Prabhu's Homepage</a>"
-                        email="mailto:dean.sw@iitdh.ac.in"
-                    />
-                </div>
+                
+                
                 <div className="col-md-3">
                     <BootstrapCard
-                        image={ArunVerma}
-                        name="Shri. Arun Verma"
+                        image={ChetanTotad}
+                        name="Shri. Chetan Basavaraj Totad"
                         title="Assistant Registrar, Student Welfare"
-                        moreInfoHTML="<a href='https://iitdh.ac.in/node/2468'>Shri. Arun Verma's Homepage</a>"
+                        moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/chetan-basavaraj-totad'>Shri. Chetan Totad's Homepage</a>"
                         email="mailto:arsw@iitdh.ac.in"
                     />
-                </div>
-                <div className="col-md-3">
                 </div>
                 <div className="col-md-3">
                     <BootstrapCard
@@ -69,15 +57,7 @@ export default function AdministrativeOffice() {
                         email="mailto:amoldiwate@iitdh.ac.in"
                     />
                 </div>
-                <div className="col-md-3">
-                    <BootstrapCard
-                        image={Avinash}
-                        name="Shri. Avinash B"
-                        title="Junior Assistant"
-                        moreInfoHTML="<a href='https://iitdh.ac.in/user-profile/avinash-b'>Shri. Avinash B's Homepage</a>"
-                        email="mailto:avinashb@iitdh.ac.in"
-                    />
-                </div>
+                
                 <div className="col-md-3">
                     <BootstrapCard
                         image={JanardhanReddy}

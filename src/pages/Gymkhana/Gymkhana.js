@@ -136,7 +136,7 @@ export default function Gymkhana() {
                             </div>*/}
 
                             <div className="row pt-2 justify-content-center">
-                                <div className="col-lg-4 col-md-12">
+                                <div className="col-lg-6 col-md-12">
                                     <BootstrapCard
                                         image={KavitaDevi}
                                         name="Prof. Kavita Devi"
@@ -145,22 +145,13 @@ export default function Gymkhana() {
                                         email="mailto:fic.sw.nss@iitdh.ac.in"
                                     />
                                 </div>
-                                <div className="col-lg-4 col-md-6">
+                                <div className="col-lg-6 col-md-6">
                                     <BootstrapCard
                                         image={VigneshwaraRajaP}
                                         name="Prof. Vigneshwara Raja P"
                                         title="Faculty-In-Charge, Students Welfare, NCC"
                                         moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/vigneshwara-raja-p'>Prof. Vigneshwara Raja P's Homepage</a>"
                                         email="mailto:fic.sw.ncc@iitdh.ac.in"
-                                    />
-                                </div>
-                                <div className="col-lg-4 col-md-6">
-                                    <BootstrapCard
-                                        image={NagaveniS}
-                                        name="Prof. Nagaveni S"
-                                        title="Faculty-In-Charge, Students Welfare, Cultural & Technical Affairs"
-                                        moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/nagaveni-s'>Prof. Nagaveni S's Homepage</a>"
-                                        email="mailto:fic.sw.tech@iitdh.ac.in,fic.sw.cultural@iitdh.ac.in"
                                     />
                                 </div>
                             </div>

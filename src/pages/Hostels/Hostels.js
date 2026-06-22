@@ -10,7 +10,7 @@ import SudhirKumarSahoo from '../../images/faculty/sudhir-kumar-sahoo.jpg';
 import SubhashMehto from '../../images/faculty/subhash-mehto.png';
 import RakeshLingam from '../../images/faculty/rakesh-lingam.jpg';
 import SushantaKumarSethi from '../../images/faculty/sushanta-kumar-sethi.jpg';
-import RumaGhosh from '../../images/faculty/ruma-ghosh.jpg';
+import DebalinaChakravarty from '../../images/faculty/Debalina-Chakravarty.jpg';
 import ShraddhaSrivastava from '../../images/faculty/shraddha-srivastava.jpeg';
 
 
@@ -109,6 +109,20 @@ export default function Hostels() {
                 <div className='d-flex flex-column align-items-center'>
                     <div className="rounded custom-important-container p-5">
                         <h3>
+                            Chief Warden
+                        </h3>
+                        <div className="row p-2 justify-content-center">
+                            <div className="col-lg-6 col-md-6">
+                                <BootstrapCard
+                                    image={RakeshLingam}
+                                    name="Prof. Rakesh Lingam"
+                                    title="Cheif Warden"
+                                    moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/rakesh-lingam'>Prof. Rakesh Lingam's Homepage</a>"
+                                    email="mailto:chiefwarden.sw@iitdh.ac.in"
+                                />
+                            </div>
+                        </div>
+                        <h3>
                             Warden - Boys Hostel 1 PC
                         </h3>
                         <div className="row p-2 justify-content-center">
@@ -137,8 +151,8 @@ export default function Hostels() {
                             Warden - Boys Hostel 2 PC
                         </h3>
 
-                        <div className="row p-2 justify-content-center">
-                            <div className="col-lg-4 col-md-6">
+                        <div className="row p-2 justify-content-center g-4">
+                            <div className="col-lg-6 col-md-12 d-flex justify-content-center">
                                 <BootstrapCard
                                     image={SarojMondal}
                                     name="Prof. Saroj Mondal"
@@ -147,16 +161,7 @@ export default function Hostels() {
                                     email="mailto:warden-boys-hostel-2-pc@iitdh.ac.in"
                                 />
                             </div>
-                            <div className="col-lg-4 col-md-6">
-                                <BootstrapCard
-                                    image={RakeshLingam}
-                                    name="Rakesh Lingam"
-                                    title="Warden - Boys Hostel 2 PC"
-                                    moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/rakesh-lingam'>Rakesh Lingam's Homepage</a>"
-                                    email="mailto:warden-boys-hostel-2-pc@iitdh.ac.in"
-                                />
-                            </div>
-                            <div className="col-lg-4 col-md-12">
+                            <div className="col-lg-6 col-md-12 d-flex justify-content-center">
                                 <BootstrapCard
                                     image={SushantaKumarSethi}
                                     name="Prof. Sushanta Kumar Sethi"
@@ -175,10 +180,10 @@ export default function Hostels() {
                         <div className="row justify-content-center">
                             <div className="col-lg-6 col-md-6">
                                 <BootstrapCard
-                                    image={RumaGhosh}
-                                    name="Prof. Ruma Ghosh"
+                                    image={DebalinaChakravarty}
+                                    name="Prof. Debalina Chakravarty"
                                     title="Warden - Girls Hostel PC"
-                                    moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/ruma-ghosh'>Prof. Ruma Ghosh's Homepage</a>"
+                                    moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/debalina-chakravarty'>Prof. Debalina Chakravarty's Homepage</a>"
                                     email="mailto:warden-girls-hostel-1-pc@iitdh.ac.in"
                                 />
                             </div>
