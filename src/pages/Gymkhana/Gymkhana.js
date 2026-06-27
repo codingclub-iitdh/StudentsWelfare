@@ -6,9 +6,7 @@ import ImageGrid from '../../components/ImageGrid/ImageGrid.js';
 import BootstrapCard from '../../components/Cards/BootstrapCard.js';
 import {facultyInCharges, secretaries, clubSecretaries, imagesSports, imagesCultural, imagesTech, imagesSocial} from './GymkhanaData.js'
 
-import RaviGalimath from '../../images/staff/ravi-galimath.jpg';
-import KeerthiKumarM from '../../images/staff/keerthi-kumar-m.jpeg';
-import RameshG from '../../images/staff/ramesh-g.png';
+
 
 import KavitaDevi from '../../images/faculty/kavita-devi.jpg';
 import VigneshwaraRajaP from '../../images/faculty/vigneshwara-raja-p.jpg';
@@ -159,37 +157,7 @@ export default function Gymkhana() {
 
                         <hr />
 
-                        <div className='rounded custom-important-container p-3'>
-                            <h5>SPORTS OFFICERS</h5>
-                            <div style={{ width: "50px", height: "3.4px", backgroundColor: "#86198f", marginTop: "7px", marginBottom: "18px" }}></div>
-
-                            <div className="row pt-2 justify-content-center">
-                                <div className="col-lg-4 col-md-12">
-                                    <BootstrapCard
-                                        image={KeerthiKumarM}
-                                        name="Dr. Keerthi Kumar M"
-                                        title="Sports Officer"
-                                        moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/dr-keerthi-kumar-m'>Dr. Keerthi Kumar M's Homepage</a>"
-                                    />
-                                </div>
-                                <div className="col-lg-4 col-md-6">
-                                    <BootstrapCard
-                                        image={RaviGalimath}
-                                        name="Shri Ravi Shivaprakash Galimath"
-                                        title="Assistant Sports Officer"
-                                        moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/ravi-shivaprakash-galimath'>Shri Ravi Shivaprakash Galimath's Homepage</a>"
-                                    />
-                                </div>
-                                <div className="col-lg-4 col-md-6">
-                                    <BootstrapCard
-                                        image={RameshG}
-                                        name="Shri Gundaveni Ramesh"
-                                        title="Assistant Sports Officer"
-                                        moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/gundaveni-ramesh'>Shri Gundaveni Ramesh's Homepage</a>"
-                                    />
-                                </div>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
 
@@ -203,19 +171,14 @@ export default function Gymkhana() {
                             <h5>STUDENT COUNCIL SECRETARIES</h5>
                             <div style={{ width: "50px", height: "3.4px", backgroundColor: "#86198f", marginTop: "7px", marginBottom: "18px" }}></div>
 
-                            <div className='row'>
+                            <div className='row justify-content-between px-5'>
                                 <div className='d-flex flex-column align-items-center col-md-4'>
                                     <PeopleList
                                         mainTitle=""
                                         items={secretaries.filter(secretary => secretary.subTitle.startsWith('General Secretaries'))}
                                     />
                                 </div>
-                                <div className='d-flex flex-column align-items-center col-md-4'>
-                                    <PeopleList
-                                        mainTitle=""
-                                        items={secretaries.filter(secretary => secretary.subTitle.startsWith('PG Secretaries'))}
-                                    />
-                                </div>
+                               
                                 <div className='d-flex flex-column align-items-center col-md-4'>
                                     <PeopleList
                                         mainTitle=""
