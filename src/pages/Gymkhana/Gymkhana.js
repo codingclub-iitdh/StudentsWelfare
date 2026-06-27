@@ -12,7 +12,6 @@ import RameshG from '../../images/staff/ramesh-g.png';
 
 import KavitaDevi from '../../images/faculty/kavita-devi.jpg';
 import VigneshwaraRajaP from '../../images/faculty/vigneshwara-raja-p.jpg';
-import NagaveniS from '../../images/faculty/nagaveni-s.jpg';
 
 import { useRef } from 'react';
 import { FaArrowDownLong } from 'react-icons/fa6';
