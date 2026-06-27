@@ -87,22 +87,7 @@ const secretaries = [
             },
         ],
     },
-    {
-        title: '',
-        subTitle: 'PG Secretaries',
-        subSubTitles: [
-            {
-                subSubTitle: '',
-                people: [
-                    { name: 'Yogesh Kumar', designation: 'PG Secretary, Technical Affairs', email: 'cs24mt010@iitdh.ac.in'},
-                    { name: 'Pranav Deshpande', designation: 'PG Secretary, Sports Affairs', email: 'ee25dp004@iitdh.ac.in'},
-                     // { name: 'Rajput R Vikramsingh', designation: 'PG Secretary, Cultural Affairs', email: ''},
-                    { name: 'Ashish Saranshi', designation: 'PG Secretary, Hostel Affairs', email: 'cs25mt004@iitdh.ac.in'},
-                    { name: 'Kanapala SaiMaharshi', designation: 'PG Secretary, Mess Affairs', email: 'me25mt001@iitdh.ac.in' }, // Add name if available
-                ],
-            },
-        ],
-    },
+    
 ];
 
 const clubSecretaries = [

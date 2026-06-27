@@ -171,19 +171,14 @@ export default function Gymkhana() {
                             <h5>STUDENT COUNCIL SECRETARIES</h5>
                             <div style={{ width: "50px", height: "3.4px", backgroundColor: "#86198f", marginTop: "7px", marginBottom: "18px" }}></div>
 
-                            <div className='row'>
+                            <div className='row justify-content-between px-5'>
                                 <div className='d-flex flex-column align-items-center col-md-4'>
                                     <PeopleList
                                         mainTitle=""
                                         items={secretaries.filter(secretary => secretary.subTitle.startsWith('General Secretaries'))}
                                     />
                                 </div>
-                                <div className='d-flex flex-column align-items-center col-md-4'>
-                                    <PeopleList
-                                        mainTitle=""
-                                        items={secretaries.filter(secretary => secretary.subTitle.startsWith('PG Secretaries'))}
-                                    />
-                                </div>
+                               
                                 <div className='d-flex flex-column align-items-center col-md-4'>
                                     <PeopleList
                                         mainTitle=""
