@@ -6,7 +6,7 @@ import { SiGotomeeting } from 'react-icons/si';
 import { useRef } from 'react';
 
 import RajshekarK from '../../../images/faculty/rajshekar-k.jpg';
-import OmkarBembalge from '../../../images/faculty/omkar-basavaraj-bembalge.jpg';
+import OmkarBasavaraj from '../../../images/faculty/omkar-basavaraj-bembalge.jpg';
 import RidhimaTewari from '../../../images/faculty/ridhima-tewari.jpg';
 
 import BootstrapCard from '../../../components/Cards/BootstrapCard.js';
@@ -38,13 +38,13 @@ export default function WellnessSection() {
         <>
             <motion.div className='pb-5 pt-2' initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <div className="d-flex flex-column">
-                    <hr className="w-50 border-3 align-self-center"/>
+                    <hr className="w-50 border-3 align-self-center" />
                 </div>
 
                 <h1 className='mb-2'>Wellness & Health</h1>
 
                 <div className="d-flex flex-column">
-                    <hr className="w-50 border-3 align-self-center"/>
+                    <hr className="w-50 border-3 align-self-center" />
                 </div>
 
                 <div className='mt-5'>
@@ -62,7 +62,7 @@ export default function WellnessSection() {
 
                     <div className='mt-5 card custom-important-container text-center pt-5'>
                         <img className='card-img-top w-75 h-auto' src={wellnesscentre} alt="Wellness Centre" />
-			<div className='card-body'>
+                        <div className='card-body'>
                             <b><p className='fs-3'>Contacts</p></b>
                             <p className='fs-5 text-muted'><i>For Ambulance Services:</i> +918971523447</p>
                             <p className='fs-5 text-muted'><i>Wellness Center Mobile:</i> +918147403386</p>
@@ -98,27 +98,27 @@ export default function WellnessSection() {
                                 <BootstrapCard
                                     image={RidhimaTewari}
                                     name="Prof. Ridhima Tewari"
-                                    title="Associate Dean, Students Welfare, Wellness"
+                                    title="Dean Wellness"
                                     moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/ridhima-tewari'>Prof. Ridhima Tewari's Homepage</a>"
-                                    email="mailto:adean.sww@iitdh.ac.in"
+                                    email="mailto:dean.wellness@iitdh.ac.in"
                                 />
                             </div>
                             <div className="col-lg-4 col-md-6">
                                 <BootstrapCard
                                     image={RajshekarK}
                                     name="Prof. Rajshekar K"
-                                    title="Faculty-In-Charge, Counselling"
+                                    title="Associate Dean, Wellness"
                                     moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/rajshekar-k'>Prof. Rajshekar K's Homepage</a>"
-                                    email="mailto:fic.counselling@iitdh.ac.in"
+                                    email="mailto:adean.sww@iitdh.ac.in"
                                 />
                             </div>
                             <div className="col-lg-4 col-md-6">
                                 <BootstrapCard
-                                    image={OmkarBembalge}
-                                    name="Prof. Omkar Basavaraj Bembalge"
-                                    title="Faculty-In-Charge, Students Welfare (Health and Ambulance)"
-                                    moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/omkar-baswaraj-bembalge'>Prof. Omkar Basavaraj Bembalge's Homepage</a>"
-                                    email="mailto:fic.health@iitdh.ac.in"
+                                    image={OmkarBasavaraj}
+                                    name="Prof. Omkar Baswaraj Bembalge"
+                                    title="Faculty-In-Charge, Wellness"
+                                    moreInfoHTML="<a href='https://www.iitdh.ac.in/user-profile/omkar-baswaraj-bembalge'>Prof. Omkar Baswaraj Bembalge's Homepage</a>"
+                                    email="mailto:fic.counselling@iitdh.ac.in"
                                 />
                             </div>
                         </div>
