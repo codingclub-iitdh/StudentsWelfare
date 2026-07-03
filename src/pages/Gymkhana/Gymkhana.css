@@ -1,284 +1,262 @@
-.gymkhana-council-box {
-    border: 3px solid #c084fc;
-    border-radius: 5px;
-    cursor: pointer;
-    padding: 20px;
-    height: 100%;
-    transition: background-color 0.3s, color 0.3s;
+/* Gymkhana Page Layout Styles */
+
+/* Council Navigation Cards */
+.gymkhana-council-card {
+  background: #ffffff;
+  border: 1px solid rgba(133, 25, 142, 0.12);
+  border-radius: 12px;
+  padding: 1.5rem;
+  height: 100%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(133, 25, 142, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
 }
 
-.gymkhana-council-box:hover {
-    background-color: #c084fc55;
-    color: #000;
+.gymkhana-council-card:hover {
+  transform: translateY(-5px);
+  border-color: #85198e;
+  box-shadow: 0 10px 25px rgba(133, 25, 142, 0.12);
+  background-color: rgba(133, 25, 142, 0.01);
 }
 
-.gymkhana-council-box p {
-    text-align: center;
-    margin: 10px;
-    font-weight: 600;
-    font-size: 1.7rem;
+.gymkhana-council-card h3 {
+  font-family: "Jost", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #85198e;
+  text-align: center;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.gymkhana-council-box ul {
-    font-size: 20px;
-    font-weight: 600;
-    position: relative;
+.gymkhana-council-card ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  margin-top: auto;
 }
 
-.gymkhana-council-box ul li {
-    margin-bottom: 10px;
+.gymkhana-council-card ul li {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.blink-shadow {
-    position: absolute;
-    background-color: #c084fc;
-    padding: 5px 15px;
-    border-radius: 5px;
+.gymkhana-council-card ul li::before {
+  content: "•";
+  color: #85198e;
+  font-weight: bold;
 }
 
-/*================================================================*/
-.main-gymkhana {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-top: 50px;
-
-    /* margin-left: 290px; */
-    /* margin-right: 20px; */
-    margin-bottom: 10%;
-    animation: fade-up 0.5s;
+/* Tab Switcher Controls */
+.btn-tab {
+  background: rgba(133, 25, 142, 0.05);
+  border: 1px solid rgba(133, 25, 142, 0.15);
+  color: #85198e;
+  padding: 0.6rem 1.5rem;
+  border-radius: 30px;
+  font-weight: 600;
+  font-family: "Jost", sans-serif;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.95rem;
 }
-@keyframes fade-down {
-    0%{
-        opacity: 0;
-        transform: translateY(-30px) scale(0.9);
-    }
-    100%{
-        opacity: 1;
-        transform: translateY(0px) scale(1);
-    }
+
+.btn-tab:hover {
+  background: rgba(133, 25, 142, 0.1);
+  color: #85198e;
+}
+
+.btn-tab.active {
+  background: #85198e;
+  color: #ffffff;
+  border-color: #85198e;
+  box-shadow: 0 4px 12px rgba(133, 25, 142, 0.25);
+}
+
+/* Minimal Grid Text-Block Directory Layout (Human-Designed Aesthetic) */
+.minimal-text-block {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding: 0.5rem 0;
+  transition: all 0.2s ease-in-out;
+}
+
+.minimal-text-block:hover {
+  transform: translateY(-2px);
+}
+
+.minimal-block-name {
+  font-family: "Jost", sans-serif;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: #374151; /* Soft Charcoal */
+  margin-bottom: 0.2rem;
+}
+
+.minimal-block-role {
+  font-family: "Jost", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #85198e; /* Theme purple color to emphasize the post */
+  margin-bottom: 0.35rem;
+  line-height: 1.35;
+  letter-spacing: 0.2px;
+}
+
+.minimal-block-email {
+  font-family: "Jost", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #9ca3af !important; /* Low contrast desaturated gray */
+  text-decoration: none !important;
+  transition: color 0.2s ease;
+  word-break: break-all;
+}
+
+.minimal-text-block:hover .minimal-block-email {
+  color: #85198e !important; /* Muted Purple accent */
+  text-decoration: underline !important;
+}
+
+/* Vertical divider running down the center of the Club Secretaries directory grid */
+@media (min-width: 768px) {
+  .club-directory-divider {
+    border-right: 1px solid rgba(133, 25, 142, 0.12);
+    padding-right: 2rem !important;
   }
-  @keyframes fade-up {
-    0%{
-        opacity: 0;
-        transform: translateY(30px) scale(0.9);
-    }
-    100%{
-        opacity: 1;
-        transform: translateY(0px) scale(1);
-    }
+}
+
+/* Editorial Grid Columns & Lists */
+@media (min-width: 768px) {
+  .council-column {
+    border-right: 1px solid rgba(133, 25, 142, 0.12);
   }
-.gymkhana-sub-1:hover {
-    background-color: #c084fc;
-    color: #f8fafc;
-
-}
-.gymkhana-header h3{
-    font-size: 2rem;
-    font-weight: 600;
-}
-.gymkhana-font p {
-    font-size: 1.5rem;
-}
-.tech-club-fs p{
-    line-height: 27px;
+  .council-column:last-child {
+    border-right: none;
+  }
 }
 
-.tech-board-sub-header {
-    font-size: 1.6rem;
-    font-weight: 600;
-    margin: 25px 0px 10px 0px;
-    padding-left: 10px;
-    border-left: 5px solid #c00404;
+.council-column-title {
+  font-family: "Jost", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #312e81; /* Matches site dark indigo */
+  padding-bottom: 0.5rem;
+  border-bottom: 2.5px solid #85198e; /* Theme purple accent line */
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.list-items li {
-    font-size: 23px;
-    margin-top: 20px;
-
+.council-column-list {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0;
 }
 
-.sentense-gymkhana p {
-    font-size: 1.3rem;
-    color: #4c5157;
-    line-height: 25px;
-
+.council-column-list li {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #4b5563;
+  padding: 0.45rem 0.75rem;
+  border-left: 2.5px solid transparent;
+  transition: all 0.2s ease-in-out;
+  cursor: default;
 }
 
-.sports-section-header {
-    margin: 30px 0px 10px 0px;
+.council-column-list li:hover {
+  color: #85198e;
+  border-left-color: #85198e;
+  background-color: rgba(133, 25, 142, 0.035);
+  padding-left: 1.1rem; /* Sleek shift transition */
 }
 
-img {
-    width: 300px;
-    height: 300px;
-    object-fit: cover;
-    object-position: center;
-    background-color: rgb(150, 149, 149);
-    transition: all ease-in-out 0.3s;
-
+/* Editorial Social Activity Blocks */
+.social-activity-block {
+  border-left: 3px solid rgba(133, 25, 142, 0.25);
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-left-color 0.25s ease;
+  height: 100%;
 }
 
-img:hover {
-/*     box-shadow: rgba(0, 0, 0, 0.4) 0px 30px 90px; */
-    opacity: 0.9;
-    cursor: pointer;
+.social-activity-block:hover {
+  border-left-color: #85198e;
 }
 
-.gymkhana-photos {
-    margin-top: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 5px;
+.social-activity-block h4 {
+  font-family: "Jost", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #312e81;
+  margin-bottom: 0.5rem;
 }
 
-.list-items p {
-    font-size: 1.4rem;
-    color: #0284c7;
+.social-activity-block p {
+  font-size: 0.98rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin-bottom: 0;
 }
 
-.list-items ul li a:hover {
-    color: #ef4444;
-
+/* Custom 5 column layout grid on large screens */
+@media (min-width: 992px) {
+  .col-lg-2-4 {
+    flex: 0 0 20%;
+    max-width: 20%;
+  }
 }
 
-.gymkhana-sub-1 {
-    width: 275px;
-    height: 250px;
+.image-block {
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+  width: 100%;
 }
 
-.image-div img {
-    width: 600px;
+/* Styled Eye-Catchy Headers for Student Council */
+.council-main-header {
+  font-family: "Jost", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #111827;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 2rem;
+  position: relative;
+  padding-bottom: 0.75rem;
 }
 
-.board-flex {
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
+.council-main-header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(to right, #85198e, #312e81);
+  border-radius: 2px;
 }
 
-.tech-board p {
-    font-size: 1.3rem;
-}
-.t-fs-t p{
-    font-size: 1.3rem;
-    line-height: 27px;
-}
-
-@media (min-width:1700px) {
-    .image-div img {
-        width: 650px;
-    }
-
-    .main-gymkhana {
-        padding-left: 30px;
-        padding-right: 150px;
-    }
-
-    .gymkhana-font p {
-        font-size: 1.5rem;
-        line-height: 35px;
-
-    }
-    .tech-board p{
-        font-size: 1.5rem;
-        line-height: 35px;
-    }
-    .sports-photos p {
-        font-size: 1.5rem;
-        line-height: 35px;
-    }
-    .list-items ul li {
-        font-size: 1.7rem;
-    }
-}
-
-@media (max-width:1024px) {
-    .main-gymkhana {
-        margin-left: 0px;
-        margin-right: 0px;
-        margin-top: 110px;
-        margin-bottom: 50%;
-        width: 100vw;
-
-        padding-right: 30px;
-    }
-    .t-fs-t p{
-        font-size: 1.1rem;
-        line-height: 30px;
-    }
-    .tech-board{
-        margin-top: 30px;
-    }
-    .gymkhana-header h3{
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: rgb(30, 64, 175);
-    }
-    .tech-club-fs{
-        padding-left: 20px;
-        padding-right: 20px;
-    }
-    .tech-club-fs p{
-        line-height: 30px;
-    }
-    .tech-board{
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-    .alumni-fs p{
-        font-size: 1rem;
-    }
-
-    .gymkhana-sub {
-        flex-wrap: wrap;
-    }
-
-    .image-div img {
-        width: 250px;
-        height: 230px;
-    }
-
-    .list-items {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .board-flex {
-        gap: 20px;
-    }
-
-    .gymkhana-font p {
-        font-size: 1.1rem;
-        line-height: 20px;
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-
-    .list-items ul li {
-        font-size: 1.1rem;
-    }
-
-    .tech-board-sub-header {
-        font-size: 1.5rem;
-        margin-left: 20px;
-    }
-
-    .tech-board-sub-header p {
-        font-size: 1.3rem;
-    }
-
-
-
-    h3 {
-        font-size: 1.5rem;
-    }
-
-    .tech-board p {
-        font-size: 1.1rem;
-        line-height: 30px;
-    }
+.council-sub-header {
+  font-family: "Jost", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #312e81;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-left: 3px solid #85198e;
+  padding-left: 0.75rem;
+  margin-bottom: 1.5rem;
 }

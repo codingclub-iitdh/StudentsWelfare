@@ -146,7 +146,7 @@ const clubSecretaries = [
                     { name: 'Souhardya Majumder', designation: 'Deputy Club Secretary, Chess', email: 'me25bt039@iitdh.ac.in'},
 
                     { name: 'Aditya Raj Singh Digari', designation: 'Club Secretary, Weightlifting', email: 'is24bm035@iitdh.ac.in'},
-                    { name: 'Parth Patel', designation: 'Deputy Club Secretary, Weighlifting', email:'ec25bt016@iitdh.ac.in' },
+                    { name: 'Parth Patel', designation: 'Deputy Club Secretary, Weightlifting', email:'ec25bt016@iitdh.ac.in' },
 
                     { name: 'Abhinay Kumar B', designation: 'Club Secretary, Cricket', email: 'is24bm044@iitdh.ac.in'},
                     { name: 'Jillella Akhil Kumar', designation: 'Deputy Club Secretary, Cricket', email: 'ec25bt012@iitdh.ac.in'},
