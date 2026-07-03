@@ -100,22 +100,30 @@ const clubSecretaries = [
                 people: [
                     { name: 'Gourav Sherikar', designation: 'Club Secretary, Coding', email: 'mc24bt009@iitdh.ac.in'},
                     { name: 'Aaditya Kumar', designation: 'Deputy Club Secretary, Coding', email: 'cs24bt012@iitdh.ac.in'},
+
                     { name: 'Anubhav Goyal', designation: 'Club Secretary, AI', email: 'mc24bt005@iitdh.ac.in'},
                     { name: 'Kaustubh Kesherwani', designation: 'Deputy Club Secretary, AI', email: 'is25bm036@iitdh.ac.in'},
+
                     { name: 'Balamurali V B', designation: 'Club Secretary, Space Data Science', email: 'me24bt047@iitdh.ac.in'},
                     { name: 'Priyanshu Nimbalkar', designation: 'Deputy Club Secretary, Space Data Science', email: 'ec25bt041@iitdh.ac.in'},
+
                     { name: 'Tushar Hegde', designation: 'Club Secretary, Robotics', email: 'ep24bt002@iitdh.ac.in'},
                     { name: 'Simarjeet Singh', designation: 'Deputy Club Secretary, Robotics', email: 'ep25bt011@iitdh.ac.in'},
+
                     { name: 'Samarth M', designation: 'Club Secretary, Finance', email: 'mc24bt010@iitdh.ac.in'},
                     { name: 'Divyansh Sahu', designation: 'Deputy Club Secretary, Finance', email: 'mc25bt017@iitdh.ac.in'},
+
                     { name: 'Dusi Venkata Surya Gowri Nageswar', designation: 'Club Secretary, Ingene Motorsport', email: 'me24bt018@iitdh.ac.in' },
                     { name: 'Kakaday Barath Palash', designation: 'Deputy Club Secretary, Ingene Motorsport', email: 'me25bt001@iitdh.ac.in'},
+
                     { name: 'K S Navjeevan', designation: 'Club Secretary, Design', email: 'ec24bt022@iitdh.ac.in'},
                     { name: 'Digvijay Kirgat', designation: 'Deputy Club Secretary, Design', email: 'ee24bt024@iitdh.ac.in'},
+
+                    { name: 'Maanas Khatotkar', designation: 'Club Secretary, Electronics', email: 'ec24bt023@iitdh.ac.in'},
+                    { name: 'Kshitij Seshadri', designation: 'Deputy Club Secretary, Electronics', email: 'ee25bt004@iitdh.ac.in'},
+                    
                     { name: 'Rithika Athawade', designation: 'Club Secretary, Astronomy', email: 'is24bm031@iitdh.ac.in'},
                     { name: 'Rithika Athawade', designation: 'Deputy Club Secretary, Astronomy', email: 'is24bm031@iitdh.ac.in'},
-                    { name: 'Maanas Khatotkar', designation: 'Club Secretary, Electronics', email: 'ec24bt023@iitdh.ac.in'},
-                    { name: 'Kshitij Seshadri', designation: 'Deputy Club Secretary, Electronics', email: 'ee25bt004@iitdh.ac.in'}
                 ],
             },
         ],
@@ -128,35 +136,48 @@ const clubSecretaries = [
                 subSubTitle: '',
                 people: [
                     { name: 'Himanshu Verma', designation: 'Club Secretary, Athletics', email: 'ec24bt039@iitdh.ac.in'},
+                    { name: 'Kedar Kumawat', designation: 'Deputy Club Secretary, Athletics', email: 'me25bt016@iitdh.ac.in'},
+
                     // { name: 'Maddela Vaishwitha', designation: 'Club Secretary, Badminton' },
                     { name: 'Aadhi Shankar R S', designation: 'Club Secretary, Basketball', email: 'me24bt028@iitdh.ac.in'},
+                    { name: 'Galla Siddhardha', designation: 'Deputy Club Secretary, Basketball', email: 'is25bm044@iitdh.ac.in'},
+
                     { name: 'Srivatsa Bharadwaj', designation: 'Club Secretary, Chess', email: 'cs24bt004@iitdh.ac.in'},
+                    { name: 'Souhardya Majumder', designation: 'Deputy Club Secretary, Chess', email: 'me25bt039@iitdh.ac.in'},
+
                     { name: 'Aditya Raj Singh Digari', designation: 'Club Secretary, Weightlifting', email: 'is24bm035@iitdh.ac.in'},
+                    { name: 'Parth Patel', designation: 'Deputy Club Secretary, Weighlifting', email:'ec25bt016@iitdh.ac.in' },
+
                     { name: 'Abhinay Kumar B', designation: 'Club Secretary, Cricket', email: 'is24bm044@iitdh.ac.in'},
-                    { name: 'Vyom Divecha', designation: 'Club Secretary, E-Sports', email: 'me24bt005@iitdh.ac.in'},
+                    { name: 'Jillella Akhil Kumar', designation: 'Deputy Club Secretary, Cricket', email: 'ec25bt012@iitdh.ac.in'},
+                    
                     { name: 'Tanveer Shaik', designation: 'Club Secretary, Football', email: 'mc24bt014@iitdh.ac.in'},
+                    { name: 'Mohammed Fahad Faizaan', designation: 'Deputy Club Secretary, Football', email: 'ep25bt027@iitdh.ac.in'},
+
                     // { name: 'Deepansh Pandey', designation: 'Club Secretary, Tennis', email: 'is23bm037@iitdh.ac.in'},
-                    // { name: 'Ajitesh Manan Jha', designation: 'Club Secretary, Table Tennis', email: 'me23bt013@iitdh.ac.in'},
+                    { name: 'Arnav Sanjay Magdum', designation: 'Club Secretary, Table Tennis', email: 'me23bt013@iitdh.ac.in'},
+                    { name: 'Siya Paliwal', designation: 'Deputy Club Secretary, Table Tennis', email: 'ec25bt030@iitdh.ac.in'},
+
                     { name: 'Varshith Aithe', designation: 'Club Secretary, Volleyball', email: 'ec24bt025@iitdh.ac.in'},
+                    { name: 'Harsh', designation: 'Deputy Club Secretary, Volleyball', email: 'ep25bt004@iitdh.ac.in'},
+
                     { name: 'Yogya Ahuja', designation: 'Club Secretary, Squash', email: 'mc24bt016@iitdh.ac.in'},
+                    { name: 'Yugnsh Sethi', designation: 'Deputy Club Secretary, Squash', email:'ch25bt016@iitdh.ac.in'},
+
                     // { name: 'Charan Shakthi Yuvaraj', designation: 'Club Secretary, Yoga', email: 'ep23bt006@iitdh.ac.in'},
                     { name: 'Ellamsetty Madhava Vijaya Ramarao', designation: 'Club Secretary, Hockey', emal:'ce24bt008@iitdh.ac.in' },
-                    { name: 'Divyansh Prakash', designation: 'Junior Club Secretary, Athletics', email: 'cs24bt046@iitdh.ac.in'},
-                    { name: 'Veer Doshi', designation: 'Junior Club Secretary, Badminton', email: 'me24bt009@iitdh.ac.in'},
-                    { name: 'Aadhi Shankar R S', designation: 'Junior Club Secretary, Basketball', email: 'me24bt028@iitdh.ac.in'},
-                    { name: 'Srivatsa Bharadwaj', designation: 'Junior Club Secretary, Chess', email: 'cs24bt004@iitdh.ac.in'},
-                    { name: 'Pranav Subhash Newton', designation: 'Junior Club Secretary, E-Sports', email: 'ec24bt011@iitdh.ac.in'},
-                    { name: 'B Abhinay Kumar', designation: 'Junior Club Secretary, Cricket', email: 'is24bm044@iitdh.ac.in'},
-                    { name: 'Tanveer Shaik', designation: 'Junior Club Secretary, Football', email: 'mc24bt014@iitdh.ac.in'},
-                    { name: 'Jayesh', designation: 'Junior Club Secretary, Table Tennis', email: 'is24bm008@iitdh.ac.in'},
-                    { name: 'Arnav', designation: 'Junior Club Secretary, Tennis', email: 'ce24bt002@iitdh.ac.in'},
-                    { name: 'D. Mukesh Das', designation: 'Junior Club Secretary, Volleyball', email: 'ee24bt008@iitdh.ac.in'},
-                    // { name: '', designation: 'Junior Club Secretary, Weighlifting' },
-                    // { name: '', designation: 'Junior Club Secretary, Squash' },
-                    { name: 'Ellamsetty Madhava Vijaya Ramarao', designation: 'Junior Club Secretary, Hockey', email: 'me24bt008@iitdh.ac.in'},
-                    // { name: '', designation: 'Junior Club Secretary, Yoga' },
-                    // { name: '', designation: 'NSS Secretary' },
+                    { name: 'Maram Praveen Chowdary', designation: 'Deputy Club Secretary, Hockey', email: 'is25bm041@iitdh.ac.in'},
+
+                    { name: 'Vyom Divecha', designation: 'Club Secretary, E-Sports', email: 'me24bt005@iitdh.ac.in'},
+                    
+                    { name: 'Armaan Saifi', designation: 'Deputy Club Secretary, Badminton', email: 'ch25bt006@iitdh.ac.in'},
+                    
                     { name: 'Chaitanya Handore', designation: 'Girls nominee for sports', email: 'me25bt008@iitdh.ac.in'},
+                    // { name: 'Pranav Subhash Newton', designation: 'Deputy Club Secretary, E-Sports', email: 'ec24bt011@iitdh.ac.in'},
+                    // { name: 'Jayesh', designation: 'Deputy Club Secretary, Tennis', email: 'is24bm008@iitdh.ac.in'},
+                    // { name: '', designation: 'Deputy Club Secretary, Yoga' },
+                    // { name: '', designation: 'NSS Secretary' },
+                    
                 ],
             },
         ],
@@ -169,22 +190,32 @@ const clubSecretaries = [
                 subSubTitle: '',
                 people: [
                     { name: 'Partha Sarathi Roy', designation: 'Club Secretary, Dramatics',email: 'cs24bt027@iitdh.ac.in'},
+                    { name: 'Devendra Gurjar', designation: 'Deputy Club Secretary, Dramatics', email: 'ch25bt022@iitdh.ac.in'},
+
                     { name: 'L Shreya', designation: 'Club Secretary, Fine Arts', email: 'ee24bt015@iitdh.ac.in'},
-                    // { name: '', designation: 'Club Secretary, Literary', email: ''},
+                    { name: 'Madhvesh Deulkar', designation: 'Deputy Club Secretary, Fine Arts', email: 'ce25bt0225@iitdh.ac.in'},
+
+                    { name: 'Sudhakar Shivanand Dalawayi', designation: 'Club Secretary, Literary', email: 'cs24bt008@iitdh.ac.in'},
+
                     { name: 'Siddhant Pai', designation: 'Club Secretary, Music', email: 'mc24bt017@iitdh.ac.in'},
+                    { name: 'Rushikesh Deshmukh', designation: 'Deputy Club Secretary, Music', email: 'me24bt020@iitdh.ac.in'},
+
                     { name: 'Ayush Raj', designation: 'Club Secretary, Photography and Films', email: 'is24bm003@iitdh.ac.in'},
+                    { name: 'Saket Venkat Gunda', designation: 'Deputy Club Secretary, Photography and Films', email: 'is25bm0373@iitdh.ac.in'},
+
                     { name: 'Nirav Mittal', designation: 'Club Secretary, Quiz', email: 'me24bt001@iitdh.ac.in'},
-                    { name: 'P Mahita', designation: 'Club Secretary, Prabodhini', email: 'cs24bt054@iitdh.ac.in'},
-                    // { name: 'Lavanya Jayant Shende', designation: 'Club Secretary, Dhristi', email: 'is23bm007@iitdh.ac.in'},
+                    { name: 'Shreyash Jagdale', designation: 'Deputy Club Secretary, Quiz', email: 'me25bt026@iitdh.ac.in'},
+
                     { name: 'Kamera Sucharitha', designation: 'Club Secretary, Dance', email: 'mc24bt007@iitdh.ac.in'},
+                    { name: 'H Swathi Padmal', designation: 'Deputy Club Secretary, Dance', email: 'ec25bt023@iitdh.ac.in'},
+
                     // { name: 'Sudhakar Shivanand Dalawayi', designation: 'Junior Club Secretary, Literary', email: 'cs24bt008@iitdh.ac.in'},
-                    { name: 'Soumya Basuli', designation: 'Junior Club Secretary, Music', email: 'ce24bt023@iitdh.ac.in'},
-                    { name: 'Ayush Raj', designation: 'Junior Club Secretary, Photography and Films', email: 'is24bm003@iitdh.ac.in'},
-                    { name: 'Partha Sarathi Roy', designation: 'Junior Club Secretary, Dramatics', email: 'cs24bt027@iitdh.ac.in'},
-                    { name: 'Mayank Mishra', designation: 'Junior Club Secretary, Dance', email: 'is24bm002@iitdh.ac.in'},
-                    { name: 'L Shreya', designation: 'Junior Club Secretary, Fine Arts', email: 'e24bt015@iitdh.ac.in'},
-                    { name: 'Anubhav Goyal', designation: 'Junior Club Secretary, Quiz', email: 'mc24bt005@iitdh.ac.in'},
-                    { name: 'P Mahitha', designation: 'Junior Club Secretary, Prabodhini', email: 'cs24bt054@iitdh.ac.in'},
+
+                    { name: 'P Mahita', designation: 'Club Secretary, Prabodhini', email: 'cs24bt054@iitdh.ac.in'},
+                    // { name: 'P Mahitha', designation: 'Deputy Club Secretary, Prabodhini', email: 'cs24bt054@iitdh.ac.in'},
+
+                    // { name: 'Lavanya Jayant Shende', designation: 'Club Secretary, Dhristi', email: 'is23bm007@iitdh.ac.in'},
+                    
                 ],
             },
         ],
