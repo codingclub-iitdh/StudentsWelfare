@@ -1,5 +1,4 @@
 import React from "react";
-import Scrollevent from "../../Scrollerevent";
 
 import "./Counselling.css";
 import { motion } from "framer-motion";
@@ -9,17 +8,15 @@ import te from "../../../images/tele-manas-mental-health-service1.jpg";
 import karuneMainLogo from "../../../images/counselling-centre/karune-main-logo.png";
 import DrugFlyer from "../../../images/Flyper-Drug-01.png";
 
-import mentorsData from "./CounsellingMentorsData.js";
-
-import RajshekarK from "../../../images/faculty/rajshekar-k.jpg";
 import SavitaBasavarajAngadi from "../../../images/counselling-centre/savita-basavaraj-angadi.png";
-import PradeepYammiyavar from "../../../images/faculty/pradeep-yammiyavar.jpg";
-import RidhimaTewari from "../../../images/faculty/ridhima-tewari.jpg";
-import VijayalakshmiPeri from "../../../images/counselling-centre/vijayalakshmi-peri.jpg";
 import DarshanaKishoreGandhi from "../../../images/counselling-centre/darshana-kishore-gandhi.jpg";
 import Navyashree from "../../../images/counselling-centre/navyashree.jpg";
+import SymposiumImage1 from "../../../images/counselling-centre/wellness-symposium-1.jpg";
+import SymposiumImage2 from "../../../images/counselling-centre/wellness-symposium-2.jpeg";
+import SymposiumImage3 from "../../../images/counselling-centre/wellness-symposium-3.jpg";
 
 import BootstrapCard from "../../../components/Cards/BootstrapCard.js";
+import Marquee from "react-fast-marquee";
 
 function Counselling() {
   return (
@@ -49,6 +46,7 @@ function Counselling() {
           src={karuneMainLogo}
           className="align-self-center bg-transparent"
           alt="Karune"
+          style={{ maxHeight: "200px", width: "auto" }}
         />
       </div>
 
@@ -73,120 +71,76 @@ function Counselling() {
             fontSize: "1.5rem",
             fontWeight: "bold",
             marginBottom: "1rem",
-            color: "#4338ca",
+            color: "#86198f",
           }}
         >
-          Mental Health is as important as Physical Health
-        </p>
-        <div
-        style={{
-          maxWidth: "1000px",
-          width: "90%",
-          marginTop: "20px",
-          marginBottom: "30px",
-          textAlign: "left",
-          borderTop: "3px solid #4338ca",
-          paddingTop: "25px",
-        }}
-      >
-        <h3
-          style={{
-            color: "#1f2937",
-            fontWeight: "600",
-            marginBottom: "15px",
-          }}
-        >
-          Webinar: From Curiosity to Dependence: Educating Students About Drug Risk
-        </h3>
-
-        <p className="fs-5">
-          As part of our awareness initiatives, we are hosting a webinar aimed at
-          educating the student community on the ill-effects of drugs and helping
-          overcome addiction.
-        </p>
-
-        {/* Flyer goes here */}
-        <div className="text-center my-4">
-          <img
-            src={DrugFlyer}
-            alt="Drug Awareness Webinar"
-            className="img-fluid rounded"
-            style={{
-              maxHeight: "700px",
-              width: "auto",
-            }}
-          />
-        </div>
-
-        <p className="fs-5">
-          Drug addiction or abuse continues to be a growing concern, affecting
-          individuals, families, and communities. This session conducted by
-          <strong> Dr. R.K. Suri</strong> will help participants understand the
-          causes, warning signs, impact of drug abuse, prevention strategies, and
-          ways to seek help for themselves or others in need.
-        </p>
-
-        <p className="fs-5">
-          Teenagers and students fall prey to substances and drugs, sometimes
-          becoming highly dependent on them.
+          Wellness Symposium Part II
         </p>
 
         <div
           style={{
-            background: "#f8fafc",
-            borderLeft: "4px solid #4338ca",
-            padding: "16px 20px",
+            maxWidth: "1000px",
+            width: "90%",
             marginTop: "20px",
-            marginBottom: "20px",
+            marginBottom: "30px",
+            textAlign: "left",
+            borderTop: "3px solid #86198f",
+            paddingTop: "25px",
           }}
         >
-          <p className="mb-2">
-            <strong>Speaker:</strong> Dr. R.K. Suri
+          <h3
+            style={{
+              color: "#1f2937",
+              fontWeight: "600",
+              marginBottom: "15px",
+            }}
+          >
+            Faculty Engagement in Supporting Student Well Being
+          </h3>
+
+          <p className="fs-5">
+            Students and PhD scholars face academic and personal challenges that
+            can affect their mental and emotional well being. Faculty are often
+            the first to notice when something is ongoing. This session will
+            help us understand how we can support our students, create a safe
+            and caring environment, and guide them to the right help when
+            needed.
           </p>
 
-          <p className="mb-0">
-            RCI-registered Clinical Psychologist and Mentor & Director at
-            TalkToAngel with 42+ years of experience in counselling individuals
-            across all age groups.
-          </p>
-        </div>
+          <div className="text-center my-4">
+            <Marquee direction="left" speed={60} pauseOnHover={true}>
+              {[SymposiumImage2, SymposiumImage1, SymposiumImage3].map((img, i) => (
+                <div key={i} className="symposium_image_wrapper">
+                  <img src={img} alt="Wellness Symposium" />
+                </div>
+              ))}
+            </Marquee>
+          </div>
 
-        <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mt-4">
-          <div className="fs-5">
+          <div className="symposium-meta-box">
             <div>
-              <strong>Date:</strong> 26 June 2026
+              <span>Date</span>
+              <strong>13 July 2026</strong>
             </div>
             <div>
-              <strong>Time:</strong> 12:00 PM IST
+              <span>Time</span>
+              <strong>11:00am - 12:30pm</strong>
             </div>
             <div>
-              <strong>Meeting ID:</strong> 753 083 4306
+              <span>With</span>
+              <strong>Wellness Centre - MHP's</strong>
             </div>
             <div>
-              <strong>Passcode:</strong> Talk2Angel
+              <span>Venue</span>
+              <strong>CLT - III</strong>
             </div>
           </div>
 
-          <a
-            href="https://us02web.zoom.us/j/7530834306?pwd=T8A6KdtfqPXVWUmzH2KMJ8rcpQfTQF.1&omn=86843867392"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              background: "linear-gradient(135deg, #4338ca, #6366f1)",
-              color: "white",
-              padding: "14px 28px",
-              borderRadius: "999px",
-              textDecoration: "none",
-              fontWeight: "600",
-              fontSize: "1.05rem",
-              boxShadow: "0 4px 14px rgba(67,56,202,0.25)",
-              transition: "all 0.2s ease",
-            }}
-          >
-            Join Zoom Webinar →
-          </a>
+          <div className="symposium-closing">Lets work together</div>
         </div>
-      </div>
+
+
+
         <a
           href="https://drive.google.com/file/d/1J7glzRl_Z1cnnlN_VD3iblRfbGgQAd_S/view?usp=drivesdk"
           target="_blank"
@@ -411,6 +365,98 @@ function Counselling() {
             />
           </div>
         </div>
+      </div>
+
+      <div className="d-flex flex-column align-items-center mt-5 mb-4">
+        <details className="past-events-panel">
+          <summary>Past Events</summary>
+          <div className="past-events-content">
+            <h3>
+              Webinar: From Curiosity to Dependence: Educating Students About
+              Drug Risk
+            </h3>
+
+            <p className="fs-5">
+              As part of our awareness initiatives, we hosted a webinar aimed at
+              educating the student community on the ill-effects of drugs and
+              helping overcome addiction.
+            </p>
+
+            <div className="text-center my-4">
+              <img
+                src={DrugFlyer}
+                alt="Drug Awareness Webinar"
+                className="img-fluid rounded"
+                style={{
+                  maxHeight: "700px",
+                  width: "auto",
+                }}
+              />
+            </div>
+
+            <p className="fs-5">
+              Drug addiction or abuse continues to be a growing concern,
+              affecting individuals, families, and communities. This session
+              conducted by <strong>Dr. R.K. Suri</strong> helped participants
+              understand the causes, warning signs, impact of drug abuse,
+              prevention strategies, and ways to seek help for themselves or
+              others in need.
+            </p>
+
+            <p className="fs-5">
+              Teenagers and students fall prey to substances and drugs,
+              sometimes becoming highly dependent on them.
+            </p>
+
+            <div className="past-events-speaker-box">
+              <p className="mb-2">
+                <strong>Speaker:</strong> Dr. R.K. Suri
+              </p>
+
+              <p className="mb-0">
+                RCI-registered Clinical Psychologist and Mentor & Director at
+                TalkToAngel with 42+ years of experience in counselling
+                individuals across all age groups.
+              </p>
+            </div>
+
+            <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mt-4">
+              <div className="fs-5">
+                <div>
+                  <strong>Date:</strong> 26 June 2026
+                </div>
+                <div>
+                  <strong>Time:</strong> 12:00 PM IST
+                </div>
+                <div>
+                  <strong>Meeting ID:</strong> 753 083 4306
+                </div>
+                <div>
+                  <strong>Passcode:</strong> Talk2Angel
+                </div>
+              </div>
+
+              <a
+                href="https://us02web.zoom.us/j/7530834306?pwd=T8A6KdtfqPXVWUmzH2KMJ8rcpQfTQF.1&omn=86843867392"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  background: "linear-gradient(135deg, #86198f, #ae66b5)",
+                  color: "white",
+                  padding: "14px 28px",
+                  borderRadius: "999px",
+                  textDecoration: "none",
+                  fontWeight: "600",
+                  fontSize: "1.05rem",
+                  boxShadow: "0 4px 14px rgba(134,25,143,0.25)",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                Join Zoom Webinar →
+              </a>
+            </div>
+          </div>
+        </details>
       </div>
     </motion.div>
   );
