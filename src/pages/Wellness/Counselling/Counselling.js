@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import tta from "../../../images/talktoangel.png";
 import te from "../../../images/tele-manas-mental-health-service1.jpg";
 import karuneMainLogo from "../../../images/counselling-centre/karune-main-logo.png";
+import DrugFlyer from "../../../images/Flyper-Drug-01.png";
 
 import mentorsData from "./CounsellingMentorsData.js";
 
@@ -77,6 +78,115 @@ function Counselling() {
         >
           Mental Health is as important as Physical Health
         </p>
+        <div
+        style={{
+          maxWidth: "1000px",
+          width: "90%",
+          marginTop: "20px",
+          marginBottom: "30px",
+          textAlign: "left",
+          borderTop: "3px solid #4338ca",
+          paddingTop: "25px",
+        }}
+      >
+        <h3
+          style={{
+            color: "#1f2937",
+            fontWeight: "600",
+            marginBottom: "15px",
+          }}
+        >
+          Webinar: From Curiosity to Dependence: Educating Students About Drug Risk
+        </h3>
+
+        <p className="fs-5">
+          As part of our awareness initiatives, we are hosting a webinar aimed at
+          educating the student community on the ill-effects of drugs and helping
+          overcome addiction.
+        </p>
+
+        {/* Flyer goes here */}
+        <div className="text-center my-4">
+          <img
+            src={DrugFlyer}
+            alt="Drug Awareness Webinar"
+            className="img-fluid rounded"
+            style={{
+              maxHeight: "700px",
+              width: "auto",
+            }}
+          />
+        </div>
+
+        <p className="fs-5">
+          Drug addiction or abuse continues to be a growing concern, affecting
+          individuals, families, and communities. This session conducted by
+          <strong> Dr. R.K. Suri</strong> will help participants understand the
+          causes, warning signs, impact of drug abuse, prevention strategies, and
+          ways to seek help for themselves or others in need.
+        </p>
+
+        <p className="fs-5">
+          Teenagers and students fall prey to substances and drugs, sometimes
+          becoming highly dependent on them.
+        </p>
+
+        <div
+          style={{
+            background: "#f8fafc",
+            borderLeft: "4px solid #4338ca",
+            padding: "16px 20px",
+            marginTop: "20px",
+            marginBottom: "20px",
+          }}
+        >
+          <p className="mb-2">
+            <strong>Speaker:</strong> Dr. R.K. Suri
+          </p>
+
+          <p className="mb-0">
+            RCI-registered Clinical Psychologist and Mentor & Director at
+            TalkToAngel with 42+ years of experience in counselling individuals
+            across all age groups.
+          </p>
+        </div>
+
+        <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mt-4">
+          <div className="fs-5">
+            <div>
+              <strong>Date:</strong> 26 June 2026
+            </div>
+            <div>
+              <strong>Time:</strong> 12:00 PM IST
+            </div>
+            <div>
+              <strong>Meeting ID:</strong> 753 083 4306
+            </div>
+            <div>
+              <strong>Passcode:</strong> Talk2Angel
+            </div>
+          </div>
+
+          <a
+            href="https://us02web.zoom.us/j/7530834306?pwd=T8A6KdtfqPXVWUmzH2KMJ8rcpQfTQF.1&omn=86843867392"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              background: "linear-gradient(135deg, #4338ca, #6366f1)",
+              color: "white",
+              padding: "14px 28px",
+              borderRadius: "999px",
+              textDecoration: "none",
+              fontWeight: "600",
+              fontSize: "1.05rem",
+              boxShadow: "0 4px 14px rgba(67,56,202,0.25)",
+              transition: "all 0.2s ease",
+            }}
+          >
+            Join Zoom Webinar →
+          </a>
+        </div>
+      </div>
         <a
           href="https://drive.google.com/file/d/1J7glzRl_Z1cnnlN_VD3iblRfbGgQAd_S/view?usp=drivesdk"
           target="_blank"
@@ -125,7 +235,7 @@ function Counselling() {
               src={tta}
               alt="TalkToAngel"
               className="card-img-top"
-              style={{ width: "50%", height: "auto" }}
+              style={{ width: "30%", height: "auto" }}
             />
             <div className="card-body">
               <h5 className="card-title fs-4">
@@ -160,7 +270,7 @@ function Counselling() {
               src={te}
               alt="TeleMANAS"
               className="card-img-top"
-              style={{ width: "50%", height: "auto" }}
+              style={{ width: "30%", height: "auto" }}
             />
             <div className="card-body">
               <h5 className="card-title fs-4">
