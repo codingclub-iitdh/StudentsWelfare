@@ -122,6 +122,16 @@
   transform: translateX(0);
 }
 
+.transit-main-layout {
+  align-items: flex-start;
+  width: 100%;
+}
+
+.transit-main-content {
+  width: 100%;
+  min-width: 0;
+}
+
 /* Utilities */
 .tracking-wide {
   letter-spacing: 0.05em;

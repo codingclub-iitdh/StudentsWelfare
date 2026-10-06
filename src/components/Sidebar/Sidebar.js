@@ -19,6 +19,7 @@ const Sidebar = ({ children }) => {
     location.pathname.startsWith("/dean_associate_deans_wellness");
   const isHomePage = location.pathname === "/";
   const isStudentWelfareHome = location.pathname === "/student-welfare-home";
+  const isTransitPage = location.pathname.startsWith("/transit");
 
   const wellnessLinks = [
     { path: "/dean_associate_deans_wellness", label: "Faculty in Charge" },
@@ -170,10 +171,10 @@ const Sidebar = ({ children }) => {
 
       {/* Main Content */}
       <div
-        className="d-flex justify-content-center align-items-center"
+        className={`d-flex justify-content-center ${isTransitPage ? "transit-main-layout" : "align-items-center"}`}
         style={{ height: "100%" }}
       >
-        <main>{children}</main>
+        <main className={isTransitPage ? "transit-main-content" : undefined}>{children}</main>
       </div>
       <Footer />
     </>

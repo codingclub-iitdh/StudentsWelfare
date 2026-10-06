@@ -200,9 +200,8 @@ const TransitHeader = () => {
   const { user, signOut } = useTransitAuth();
   return (
     <div className="transit-auth-bar">
-      <NavLink to="/transit" className="btn btn-link">Transit Facility</NavLink>
       {user ? (
-        <div className="d-flex align-items-center gap-3">
+        <div className="transit-auth-user">
           <span className="muted-text">{user.name} ({user.email})</span>
           <button type="button" className="btn btn-outline-secondary btn-sm" onClick={signOut}>
             Sign out
@@ -1076,7 +1075,7 @@ const BookingForm = () => {
 };
 
 const TransitPortalRoutes = () => (
-  <>
+  <div className="transit-portal-shell">
     <TransitHeader />
     <Routes>
       <Route index element={<TransitLanding />} />
@@ -1088,7 +1087,7 @@ const TransitPortalRoutes = () => (
       <Route path="manager" element={<RequireRole role="transit_manager"><ManagerDashboard /></RequireRole>} />
       <Route path="*" element={<Navigate to="/transit" replace />} />
     </Routes>
-  </>
+  </div>
 );
 
 const TransitPortal = () => (
