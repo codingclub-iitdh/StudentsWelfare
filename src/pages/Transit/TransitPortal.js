@@ -1,574 +1,200 @@
-import React, { useMemo, useState } from "react";
-import { Navigate, NavLink, Route, Routes, useNavigate } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  createBlankVisitor,
-  createInitialBookings,
+  Navigate,
+  NavLink,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+import {
+  formatTransitDate,
+  formatTransitDateTime,
   getInitialFormState,
   getMinBookingDate,
+  getStatusLabel,
+  createBlankVisitor,
+  toLocalDateTimeInput,
 } from "./transitService";
+import {
+  normalizeBooking,
+  normalizeExtension,
+  requestTransitApi,
+} from "./transitApi";
+import { TransitAuthProvider, useTransitAuth } from "./TransitAuth";
 import "./TransitPortal.css";
 
-const pad = (value) => String(value).padStart(2, "0");
+const rolePaths = {
+  student: "/transit/terms",
+  associate_dean: "/transit/dean",
+  transit_manager: "/transit/manager",
+};
 
 const getStatusClass = (status) => {
-  switch (status) {
-    case "Pending":
-      return "status-pill status-pending";
-    case "Approved":
-      return "status-pill status-approved";
-    case "Allocated":
-      return "status-pill status-allocated";
-    case "Denied":
-      return "status-pill status-denied";
-    default:
-      return "status-pill";
-  }
+  if (status === "confirmed") return "status-pill status-allocated";
+  if (status.startsWith("denied")) return "status-pill status-denied";
+  if (status === "pending_manager") return "status-pill status-approved";
+  return "status-pill status-pending";
 };
 
-const formatDateTime = (value) => {
-  if (!value) return "—";
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return value;
-  return new Intl.DateTimeFormat("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(parsed);
+const Status = ({ status }) => (
+  <span className={getStatusClass(status)}>{getStatusLabel(status)}</span>
+);
+
+const Alert = ({ error, success }) => {
+  if (error) return <div className="alert alert-danger" role="alert">{error}</div>;
+  if (success) return <div className="alert alert-success" role="status">{success}</div>;
+  return null;
 };
 
-const formatDate = (value) => {
-  if (!value) return "—";
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return value;
-  return new Intl.DateTimeFormat("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(parsed);
-};
-
-const validateBooking = (values) => {
-  const errors = {};
-
-  if (!values.studentName || !values.studentName.trim()) {
-    errors.studentName = "Student name is required.";
-  }
-
-  if (!values.rollNumber || !values.rollNumber.trim()) {
-    errors.rollNumber = "Roll number is required.";
-  }
-
-  if (!values.mobileNumber || !/^\d{10}$/.test(values.mobileNumber.trim())) {
-    errors.mobileNumber = "Enter a valid 10-digit mobile number.";
-  }
-
-  if (!values.visitorCount || Number(values.visitorCount) < 1) {
-    errors.visitorCount = "At least one visitor is required.";
-  }
-
-  const visitorList = Array.from({ length: Number(values.visitorCount || 0) }, (_, index) => values.visitors[index] || createBlankVisitor());
-  visitorList.forEach((visitor, index) => {
-    if (!visitor.name || !visitor.name.trim()) {
-      errors[`visitorName-${index}`] = "Visitor name is required.";
-    }
-    if (!visitor.relationship || !visitor.relationship.trim()) {
-      errors[`visitorRelationship-${index}`] = "Relationship is required.";
-    }
-  });
-
-  if (!values.checkInDate) {
-    errors.checkInDate = "Check-in date is required.";
-  }
-  if (!values.checkInTime) {
-    errors.checkInTime = "Check-in time is required.";
-  }
-  if (!values.checkOutDate) {
-    errors.checkOutDate = "Check-out date is required.";
-  }
-  if (!values.checkOutTime) {
-    errors.checkOutTime = "Check-out time is required.";
-  }
-
-  if (values.checkInDate && values.checkInTime && values.checkOutDate && values.checkOutTime) {
-    const checkIn = new Date(`${values.checkInDate}T${values.checkInTime}`);
-    const checkOut = new Date(`${values.checkOutDate}T${values.checkOutTime}`);
-    const minimumAllowed = getMinBookingDate();
-
-    if (checkIn < minimumAllowed) {
-      errors.checkInDate = "Booking cannot be requested within 48 hours from now.";
-      errors.checkInTime = "Booking cannot be requested within 48 hours from now.";
-    }
-
-    if (checkOut <= checkIn) {
-      errors.checkOutDate = "Check-out must be after check-in.";
-    }
-  }
-
-  return { ...errors, visitorList };
-};
-
-const StudentDashboard = () => {
-  const [bookings, setBookings] = useState(createInitialBookings);
-  const [selectedBookingId, setSelectedBookingId] = useState("TF-1001");
-  const [showExtension, setShowExtension] = useState(false);
-  const [extensionDetails, setExtensionDetails] = useState({
-    newCheckOutDate: "",
-    newCheckOutTime: "",
-    reason: "",
-  });
-  const [extensionError, setExtensionError] = useState("");
-
-  const selectedBooking = useMemo(
-    () => bookings.find((booking) => booking.id === selectedBookingId) || bookings[0],
-    [bookings, selectedBookingId]
-  );
-
-  const totalBookings = bookings.length;
-  const pendingBookings = bookings.filter((booking) => booking.status === "Pending").length;
-  const approvedBookings = bookings.filter((booking) => booking.status === "Approved").length;
-  const activeBookings = bookings.filter((booking) => booking.status === "Allocated").length;
-
-  const handleExtensionSubmit = () => {
-    if (!selectedBooking || selectedBooking.status !== "Allocated") {
-      setExtensionError("Only allocated bookings can be extended.");
-      return;
-    }
-
-    if (!extensionDetails.newCheckOutDate || !extensionDetails.newCheckOutTime) {
-      setExtensionError("Please select the new check-out date and time.");
-      return;
-    }
-
-    const currentCheckOut = new Date(`${selectedBooking.checkOut.substring(0, 10)}T${selectedBooking.checkOut.substring(11, 16)}`);
-    const requestedExtension = new Date(`${extensionDetails.newCheckOutDate}T${extensionDetails.newCheckOutTime}`);
-
-    if (requestedExtension <= currentCheckOut) {
-      setExtensionError("The requested extension must be later than the current check-out time.");
-      return;
-    }
-
-    setBookings((currentBookings) =>
-      currentBookings.map((booking) =>
-        booking.id === selectedBooking.id
-          ? {
-              ...booking,
-              status: "Approved",
-              checkOut: `${extensionDetails.newCheckOutDate}T${extensionDetails.newCheckOutTime}`,
-              extensionRequest: {
-                newCheckOutDate: extensionDetails.newCheckOutDate,
-                newCheckOutTime: extensionDetails.newCheckOutTime,
-                reason: extensionDetails.reason,
-              },
-            }
-          : booking
-      )
-    );
-
-    setShowExtension(false);
-    setExtensionDetails({ newCheckOutDate: "", newCheckOutTime: "", reason: "" });
-    setExtensionError("");
-  };
-
-  return (
-    <div className="transit-dashboard">
-      <div className="section-head mb-4">
-        <div>
-          <span className="eyebrow">Student Portal</span>
-          <h2>Transit Facility Dashboard</h2>
-        </div>
-        <NavLink to="/transit/student/booking" className="btn btn-primary btn-portal">
-          New Booking
-        </NavLink>
-      </div>
-
-      <div className="overview-grid">
-        <div className="overview-card">
-          <span>Total bookings</span>
-          <strong>{totalBookings}</strong>
-        </div>
-        <div className="overview-card accent-warn">
-          <span>Pending</span>
-          <strong>{pendingBookings}</strong>
-        </div>
-        <div className="overview-card accent-success">
-          <span>Approved</span>
-          <strong>{approvedBookings}</strong>
-        </div>
-        <div className="overview-card accent-info">
-          <span>Active / allocated</span>
-          <strong>{activeBookings}</strong>
-        </div>
-      </div>
-
-      <div className="booking-layout">
-        <div className="booking-list-panel">
-          <div className="panel-header">
-            <h3>My bookings</h3>
-          </div>
-          <div className="booking-list">
-            {bookings.map((booking) => (
-              <button
-                type="button"
-                key={booking.id}
-                className={`booking-list-item ${selectedBookingId === booking.id ? "selected" : ""}`}
-                onClick={() => setSelectedBookingId(booking.id)}
-              >
-                <div className="booking-item-top">
-                  <span>{booking.id}</span>
-                  <span className={getStatusClass(booking.status)}>{booking.status}</span>
-                </div>
-                <p>
-                  {formatDate(booking.checkIn)} – {formatDate(booking.checkOut)}
-                </p>
-                <small>{booking.visitorCount} visitors</small>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="booking-detail-panel">
-          <div className="panel-header details-header">
-            <h3>Booking details</h3>
-            {selectedBooking && selectedBooking.status === "Allocated" ? (
-              <button type="button" className="btn btn-outline-primary btn-sm" onClick={() => setShowExtension((current) => !current)}>
-                Apply for Extension
-              </button>
-            ) : null}
-          </div>
-
-          {selectedBooking ? (
-            <>
-              <div className="detail-grid">
-                <div>
-                  <label>Booking ID</label>
-                  <p>{selectedBooking.id}</p>
-                </div>
-                <div>
-                  <label>Status</label>
-                  <p>
-                    <span className={getStatusClass(selectedBooking.status)}>{selectedBooking.status}</span>
-                  </p>
-                </div>
-                <div>
-                  <label>Check-in</label>
-                  <p>{formatDateTime(selectedBooking.checkIn)}</p>
-                </div>
-                <div>
-                  <label>Check-out</label>
-                  <p>{formatDateTime(selectedBooking.checkOut)}</p>
-                </div>
-                <div>
-                  <label>Visitors</label>
-                  <p>{selectedBooking.visitorCount}</p>
-                </div>
-                <div>
-                  <label>Assigned room</label>
-                  <p>{selectedBooking.assignedRoom || "Pending allocation"}</p>
-                </div>
-              </div>
-
-              <div className="visitor-list-box">
-                <h4>Visitors</h4>
-                <ul>
-                  {selectedBooking.visitors.map((visitor, index) => (
-                    <li key={`${selectedBooking.id}-${index}`}>
-                      <strong>{visitor.name}</strong>
-                      <span>{visitor.relationship}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {showExtension && (
-                <div className="extension-panel">
-                  <h4>Extension request</h4>
-                  <p className="muted-text">
-                    This request will be routed for Associate Dean and Transit Manager approval.
-                  </p>
-                  <div className="row g-3 mt-1">
-                    <div className="col-md-6">
-                      <label className="form-label">New check-out date</label>
-                      <input
-                        className="form-control"
-                        type="date"
-                        min={selectedBooking.checkOut ? selectedBooking.checkOut.substring(0, 10) : ""}
-                        value={extensionDetails.newCheckOutDate}
-                        onChange={(event) => setExtensionDetails((current) => ({ ...current, newCheckOutDate: event.target.value }))}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">New check-out time</label>
-                      <input
-                        className="form-control"
-                        type="time"
-                        value={extensionDetails.newCheckOutTime}
-                        onChange={(event) => setExtensionDetails((current) => ({ ...current, newCheckOutTime: event.target.value }))}
-                      />
-                    </div>
-                    <div className="col-12">
-                      <label className="form-label">Reason for extension</label>
-                      <textarea
-                        className="form-control"
-                        value={extensionDetails.reason}
-                        onChange={(event) => setExtensionDetails((current) => ({ ...current, reason: event.target.value }))}
-                        rows={3}
-                      />
-                    </div>
-                  </div>
-                  {extensionError ? <p className="field-error mt-2">{extensionError}</p> : null}
-                  <div className="d-flex gap-2 mt-3">
-                    <button className="btn btn-primary" type="button" onClick={handleExtensionSubmit}>
-                      Submit extension
-                    </button>
-                    <button className="btn btn-outline-secondary" type="button" onClick={() => setShowExtension(false)}>
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="empty-state">No booking selected.</div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const AssociateDeanDashboard = () => {
-  const [bookings, setBookings] = useState(createInitialBookings);
-  const [confirmingId, setConfirmingId] = useState("" );
-  const [denialReason, setDenialReason] = useState("");
+const GoogleSignInButton = () => {
+  const buttonRef = useRef(null);
   const [error, setError] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
+  const { signIn, isSigningIn, signInError, user } = useTransitAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
-  const pendingBookings = bookings.filter((booking) => booking.status === "Pending");
+  const handleCredential = useCallback(async (response) => {
+    if (!response.credential) {
+      setError("Google did not return an ID token. Please try signing in again.");
+      return;
+    }
+    try {
+      const authenticatedUser = await signIn(response.credential);
+      const rolePath = rolePaths[authenticatedUser.role] || "/transit";
+      const requestedPath = new URLSearchParams(location.search).get("returnTo");
+      const destination = requestedPath
+        && (requestedPath === rolePath
+          || requestedPath.startsWith(`${rolePath}?`)
+          || requestedPath.startsWith(`${rolePath}/`))
+        ? requestedPath
+        : rolePath;
+      navigate(destination, { replace: true });
+    } catch {
+      // The authentication provider exposes the API error in its sign-in state.
+    }
+  }, [location.search, navigate, signIn]);
 
-  const handleDecision = (bookingId, status) => {
-    if (status === "Denied") {
-      const booking = bookings.find((item) => item.id === bookingId);
-      if (!booking) return;
+  useEffect(() => {
+    if (user) return undefined;
+    if (!clientId) {
+      setError("Set REACT_APP_GOOGLE_CLIENT_ID to the same OAuth client ID used by the backend.");
+      return undefined;
+    }
 
-      if (!denialReason.trim() && confirmingId === bookingId) {
-        setError("Please provide a denial reason or confirm the rejection.");
+    let active = true;
+    let poll;
+    const initializeButton = () => {
+      if (!active || !buttonRef.current || !window.google?.accounts?.id) return false;
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleCredential,
+      });
+      window.google.accounts.id.renderButton(buttonRef.current, {
+        theme: "outline",
+        size: "large",
+        text: "signin_with",
+        shape: "rectangular",
+        width: 260,
+      });
+      setError("");
+      return true;
+    };
+
+    const startedAt = Date.now();
+    const waitForGoogle = () => {
+      if (initializeButton()) return;
+      if (!active) return;
+      if (Date.now() - startedAt > 10000) {
+        setError("Google sign-in could not load. Check your connection and reload the page.");
         return;
       }
+      poll = window.setTimeout(waitForGoogle, 100);
+    };
+    waitForGoogle();
 
-      setConfirmingId("");
-      setError("");
-    }
+    return () => {
+      active = false;
+      window.clearTimeout(poll);
+    };
+  }, [clientId, handleCredential, user]);
 
-    setIsProcessing(true);
-    setTimeout(() => {
-      setBookings((currentBookings) =>
-        currentBookings.map((booking) =>
-          booking.id === bookingId
-            ? {
-                ...booking,
-                status,
-                denialReason: status === "Denied" ? denialReason || "Booking request not approved." : "",
-              }
-            : booking
-        )
-      );
-      setIsProcessing(false);
-      setDenialReason("");
-    }, 500);
-  };
-
+  if (user) return null;
   return (
-    <div className="transit-dashboard admin-dashboard">
-      <div className="section-head mb-4">
-        <div>
-          <span className="eyebrow">Associate Dean</span>
-          <h2>Approval queue</h2>
-        </div>
-      </div>
-
-      <div className="table-responsive">
-        <table className="table transit-table">
-          <thead>
-            <tr>
-              <th>Student</th>
-              <th>Roll</th>
-              <th>Visitors</th>
-              <th>Dates</th>
-              <th>Details</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pendingBookings.length ? (
-              pendingBookings.map((booking) => (
-                <tr key={booking.id}>
-                  <td>
-                    <div className="table-identity">
-                      <strong>{booking.studentName}</strong>
-                      <span>{booking.mobileNumber}</span>
-                    </div>
-                  </td>
-                  <td>{booking.rollNumber}</td>
-                  <td>{booking.visitorCount}</td>
-                  <td>
-                    <div className="split-date">
-                      <span>{formatDate(booking.checkIn)}</span>
-                      <span>{formatDate(booking.checkOut)}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="visitor-mini-list">
-                      {booking.visitors.map((visitor, index) => (
-                        <div key={`${booking.id}-visit-${index}`}>
-                          <strong>{visitor.name}</strong>
-                          <small>{visitor.relationship}</small>
-                        </div>
-                      ))}
-                    </div>
-                  </td>
-                  <td>
-                    <span className={getStatusClass(booking.status)}>{booking.status}</span>
-                  </td>
-                  <td>
-                    <div className="d-flex gap-2 flex-wrap">
-                      <button type="button" className="btn btn-success btn-sm" disabled={isProcessing} onClick={() => handleDecision(booking.id, "Approved")}>
-                        Approve
-                      </button>
-                      <button type="button" className="btn btn-outline-danger btn-sm" disabled={isProcessing} onClick={() => setConfirmingId(booking.id)}>
-                        Deny
-                      </button>
-                    </div>
-                    {confirmingId === booking.id ? (
-                      <div className="deny-box mt-2">
-                        <label className="form-label">Denial reason</label>
-                        <textarea
-                          className="form-control form-control-sm"
-                          rows={3}
-                          value={denialReason}
-                          onChange={(event) => setDenialReason(event.target.value)}
-                          placeholder="Provide a reason for denial"
-                        />
-                        <div className="d-flex gap-2 mt-2">
-                          <button type="button" className="btn btn-danger btn-sm" onClick={() => handleDecision(booking.id, "Denied")}>
-                            Confirm deny
-                          </button>
-                          <button type="button" className="btn btn-link btn-sm" onClick={() => { setConfirmingId(""); setError(""); }}>
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : null}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="empty-state-cell">
-                  No pending bookings require review.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {error ? <div className="alert alert-warning mt-3">{error}</div> : null}
+    <div>
+      <div ref={buttonRef} aria-label="Sign in with Google" />
+      {(error || signInError) ? (
+        <p className="field-error mt-2" role="alert">{error || signInError}</p>
+      ) : null}
+      {isSigningIn ? <p className="muted-text mt-2">Verifying your account…</p> : null}
     </div>
   );
 };
 
-const ManagerDashboard = () => {
-  const [bookings, setBookings] = useState(createInitialBookings);
-  const [roomInputs, setRoomInputs] = useState({});
-
-  const approvedBookings = bookings.filter((booking) => booking.status === "Approved");
-
-  const handleAllocation = (bookingId) => {
-    const nextRoom = roomInputs[bookingId]?.trim();
-    if (!nextRoom) {
-      return;
-    }
-
-    setBookings((currentBookings) =>
-      currentBookings.map((booking) =>
-        booking.id === bookingId
-          ? {
-              ...booking,
-              status: "Allocated",
-              assignedRoom: nextRoom,
-            }
-          : booking
-      )
-    );
-  };
-
+const TransitHeader = () => {
+  const { user, signOut } = useTransitAuth();
   return (
-    <div className="transit-dashboard manager-dashboard">
-      <div className="section-head mb-4">
-        <div>
-          <span className="eyebrow">Transit Manager</span>
-          <h2>Approved booking queue</h2>
+    <div className="transit-auth-bar">
+      <NavLink to="/transit" className="btn btn-link">Transit Facility</NavLink>
+      {user ? (
+        <div className="d-flex align-items-center gap-3">
+          <span className="muted-text">{user.name} ({user.email})</span>
+          <button type="button" className="btn btn-outline-secondary btn-sm" onClick={signOut}>
+            Sign out
+          </button>
         </div>
-      </div>
+      ) : <GoogleSignInButton />}
+    </div>
+  );
+};
 
-      <div className="manager-layout">
-        {approvedBookings.length ? (
-          approvedBookings.map((booking) => (
-            <div className="manager-card" key={booking.id}>
-              <div className="manager-card-header">
-                <div>
-                  <strong>{booking.id}</strong>
-                  <p>{booking.studentName}</p>
-                </div>
-                <span className={getStatusClass(booking.status)}>{booking.status}</span>
-              </div>
+const RequireRole = ({ role, children }) => {
+  const { user } = useTransitAuth();
+  const location = useLocation();
+  if (!user) {
+    const returnTo = `${location.pathname}${location.search}`;
+    return <Navigate to={`/transit?returnTo=${encodeURIComponent(returnTo)}`} replace />;
+  }
+  if (user.role !== role) return <Navigate to={rolePaths[user.role] || "/transit"} replace />;
+  return children;
+};
 
-              <div className="manager-meta">
-                <span>Roll no: {booking.rollNumber}</span>
-                <span>Visitors: {booking.visitorCount}</span>
-              </div>
-
-              <div className="booking-mini-grid">
-                <div>
-                  <label>Check-in</label>
-                  <p>{formatDateTime(booking.checkIn)}</p>
-                </div>
-                <div>
-                  <label>Check-out</label>
-                  <p>{formatDateTime(booking.checkOut)}</p>
-                </div>
-              </div>
-
-              <div className="visitor-mini-list compact-list">
-                {booking.visitors.map((visitor, index) => (
-                  <div key={`${booking.id}-man-${index}`}>
-                    <strong>{visitor.name}</strong>
-                    <small>{visitor.relationship}</small>
-                  </div>
-                ))}
-              </div>
-
-              <div className="allocation-box">
-                <label className="form-label">Assigned room number(s)</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="e.g., D-214 or Room 12"
-                  value={roomInputs[booking.id] || ""}
-                  onChange={(event) => setRoomInputs((current) => ({ ...current, [booking.id]: event.target.value }))}
-                />
-                <button type="button" className="btn btn-primary mt-3" onClick={() => handleAllocation(booking.id)}>
-                  Confirm allocation
-                </button>
-              </div>
-            </div>
-          ))
+const TransitLanding = () => {
+  const { user } = useTransitAuth();
+  return (
+    <div className="transit-landing">
+      <div className="landing-hero">
+        <span className="eyebrow">IIT Dharwad Students&apos; Welfare</span>
+        <h1>Transit Facility Booking Portal</h1>
+        <p>
+          Submit and track transit bookings, review student requests, and manage room allocation through the authenticated portal.
+        </p>
+        {user ? (
+          <div className="landing-actions">
+            <NavLink to={rolePaths[user.role] || "/transit"} className="btn btn-primary btn-portal">
+              Open {user.role === "associate_dean" ? "Associate Dean" : user.role === "transit_manager" ? "Transit Manager" : "Student"} portal
+            </NavLink>
+          </div>
         ) : (
-          <div className="empty-state">No approved bookings are waiting for room assignment.</div>
+          <div className="landing-actions">
+            <p className="muted-text">Sign in with your authorized IIT Dharwad Google account using the button above.</p>
+          </div>
         )}
+      </div>
+      <div className="feature-grid">
+        <div className="info-card">
+          <h3>Student flow</h3>
+          <p>Accept the current terms, submit a booking, and track its approval status.</p>
+        </div>
+        <div className="info-card">
+          <h3>Associate Dean review</h3>
+          <p>Review booking and extension requests and approve or deny them.</p>
+        </div>
+        <div className="info-card">
+          <h3>Transit Manager allocation</h3>
+          <p>Allocate rooms, confirm bookings, and make final extension decisions.</p>
+        </div>
       </div>
     </div>
   );
@@ -577,24 +203,21 @@ const ManagerDashboard = () => {
 const TermsAndConditions = () => {
   const navigate = useNavigate();
   const [accepted, setAccepted] = useState(false);
-
   return (
     <div className="transit-terms">
       <div className="terms-card">
         <span className="eyebrow">Transit Facility</span>
-        <h2>Terms & Conditions</h2>
-
+        <h2>Terms &amp; Conditions</h2>
         <div className="terms-content">
           <ul>
             <li>Visitor identity must be verified at the Transit Office before check-in.</li>
             <li>Payment for facility booking is offline and must be completed at the Transit Office as per the specified process.</li>
             <li>Bookings are subject to administrative approval and priority rules set by the Students&apos; Welfare and Transit Facility team.</li>
-            <li>Only valid IIT Dharwad student records and authenticated student information should be used while creating a request.</li>
-            <li>Admissions, visitor eligibility, and room allocation are governed by the operational rules and availability ledger maintained offline by the Transit Facility team.</li>
-            <li>No online payment gateway, Aadhaar upload, or government ID upload is part of this portal.</li>
+            <li>Only authenticated IIT Dharwad student information may be used when creating a request.</li>
+            <li>Room availability and allocation are managed offline by the Transit Facility team.</li>
+            <li>No online payment gateway or government ID upload is part of this portal.</li>
           </ul>
         </div>
-
         <div className="form-check terms-checkbox">
           <input
             id="acceptTerms"
@@ -604,15 +227,14 @@ const TermsAndConditions = () => {
             onChange={(event) => setAccepted(event.target.checked)}
           />
           <label className="form-check-label" htmlFor="acceptTerms">
-            I have read and agree to the Terms & Conditions.
+            I have read and agree to the Terms &amp; Conditions.
           </label>
         </div>
-
         <button
           type="button"
           className="btn btn-primary btn-portal"
           disabled={!accepted}
-          onClick={() => navigate("/transit/student/booking")}
+          onClick={() => navigate("/transit/student/booking", { state: { acceptedTerms: true } })}
         >
           Continue to Booking
         </button>
@@ -621,145 +243,683 @@ const TermsAndConditions = () => {
   );
 };
 
-const BookingForm = () => {
-  const navigate = useNavigate();
-  const [formValues, setFormValues] = useState(getInitialFormState());
-  const [errors, setErrors] = useState({});
-  const [serverMessage, setServerMessage] = useState("");
+const StudentDashboard = () => {
+  const { token } = useTransitAuth();
+  const [bookings, setBookings] = useState([]);
+  const [extensions, setExtensions] = useState([]);
+  const [selectedId, setSelectedId] = useState("");
+  const [extension, setExtension] = useState({ dateTime: "", reason: "" });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [refresh, setRefresh] = useState(0);
+  const [submittingExtension, setSubmittingExtension] = useState(false);
 
-  const minimumCheckInDate = getMinBookingDate();
-  const minDateValue = `${minimumCheckInDate.getFullYear()}-${pad(minimumCheckInDate.getMonth() + 1)}-${pad(minimumCheckInDate.getDate())}`;
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    Promise.all([
+      requestTransitApi("/bookings", token),
+      requestTransitApi("/extensions", token),
+    ]).then(([bookingResult, extensionResult]) => {
+      if (!active) return;
+      const nextBookings = bookingResult.bookings.map(normalizeBooking);
+      setBookings(nextBookings);
+      setExtensions(extensionResult.extensions.map(normalizeExtension));
+      setSelectedId((current) => nextBookings.some((booking) => booking.id === current)
+        ? current
+        : nextBookings[0]?.id || "");
+      setError("");
+    }).catch((requestError) => {
+      if (active) setError(requestError.message);
+    }).finally(() => {
+      if (active) setLoading(false);
+    });
+    return () => { active = false; };
+  }, [token, refresh]);
+
+  const selectedBooking = useMemo(
+    () => bookings.find((booking) => booking.id === selectedId),
+    [bookings, selectedId],
+  );
+  const selectedExtensions = extensions.filter((item) => item.bookingId === selectedId);
+  const pendingCount = bookings.filter((booking) => booking.status.startsWith("pending")).length;
+  const confirmedCount = bookings.filter((booking) => booking.status === "confirmed").length;
+
+  const submitExtension = async (event) => {
+    event.preventDefault();
+    if (!selectedBooking || !extension.dateTime || !extension.reason.trim()) {
+      setError("Choose a new check-out date and time and provide a reason.");
+      return;
+    }
+    setSubmittingExtension(true);
+    setError("");
+    setMessage("");
+    try {
+      const result = await requestTransitApi(`/bookings/${selectedBooking.id}/extensions`, token, {
+        method: "POST",
+        body: JSON.stringify({
+          requestedCheckOut: new Date(extension.dateTime).toISOString(),
+          reason: extension.reason.trim(),
+        }),
+      });
+      setMessage(result.emailNotification === "failed"
+        ? "Extension request submitted, but the Associate Dean notification email failed. Please contact the office."
+        : "Extension request submitted for Associate Dean review.");
+      setExtension({ dateTime: "", reason: "" });
+      setRefresh((value) => value + 1);
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setSubmittingExtension(false);
+    }
+  };
+
+  return (
+    <div className="transit-dashboard">
+      <div className="section-head mb-4">
+        <div><span className="eyebrow">Student Portal</span><h2>Transit Facility Dashboard</h2></div>
+        <NavLink to="/transit/terms" className="btn btn-primary btn-portal">New Booking</NavLink>
+      </div>
+      <Alert error={error} success={message} />
+      <div className="overview-grid">
+        <div className="overview-card"><span>Total bookings</span><strong>{bookings.length}</strong></div>
+        <div className="overview-card accent-warn"><span>Pending</span><strong>{pendingCount}</strong></div>
+        <div className="overview-card accent-success"><span>Confirmed</span><strong>{confirmedCount}</strong></div>
+        <div className="overview-card accent-info"><span>Extensions</span><strong>{extensions.length}</strong></div>
+      </div>
+      {loading ? <p>Loading your bookings…</p> : null}
+      {!loading ? (
+        <div className="booking-layout">
+          <div className="booking-list-panel">
+            <div className="panel-header"><h3>My bookings</h3></div>
+            <div className="booking-list">
+              {bookings.map((booking) => (
+                <button
+                  type="button"
+                  key={booking.id}
+                  className={`booking-list-item ${selectedId === booking.id ? "selected" : ""}`}
+                  onClick={() => setSelectedId(booking.id)}
+                >
+                  <div className="booking-item-top"><span>{booking.id.slice(0, 8)}</span><Status status={booking.status} /></div>
+                  <p>{formatTransitDateTime(booking.checkIn)} – {formatTransitDateTime(booking.checkOut)}</p>
+                  <small>{booking.visitorCount} visitors</small>
+                </button>
+              ))}
+              {!bookings.length ? <div className="empty-state">No bookings yet.</div> : null}
+            </div>
+          </div>
+          <div className="booking-detail-panel">
+            <div className="panel-header details-header"><h3>Booking details</h3></div>
+            {selectedBooking ? (
+              <>
+                <div className="detail-grid">
+                  <div><label>Status</label><p><Status status={selectedBooking.status} /></p></div>
+                  <div><label>Student</label><p>{selectedBooking.studentName}</p></div>
+                  <div><label>Check-in</label><p>{formatTransitDateTime(selectedBooking.checkIn)}</p></div>
+                  <div><label>Check-out</label><p>{formatTransitDateTime(selectedBooking.checkOut)}</p></div>
+                  <div><label>Visitors</label><p>{selectedBooking.visitorCount}</p></div>
+                  <div><label>Assigned room</label><p>{selectedBooking.assignedRoom || "Pending allocation"}</p></div>
+                </div>
+                <div className="visitor-list-box">
+                  <h4>Visitors</h4>
+                  <ul>{selectedBooking.visitors.map((visitor, index) => (
+                    <li key={`${selectedBooking.id}-${index}`}><strong>{visitor.name}</strong><span>{visitor.relationship}</span></li>
+                  ))}</ul>
+                </div>
+                {selectedExtensions.length ? (
+                  <div className="visitor-list-box">
+                    <h4>Extension requests</h4>
+                    <ul>{selectedExtensions.map((item) => (
+                      <li key={item.id}>
+                        <span>{formatTransitDate(item.requestedCheckOut)} · {item.reason}</span>
+                        <Status status={item.status} />
+                      </li>
+                    ))}</ul>
+                  </div>
+                ) : null}
+                {selectedBooking.status === "confirmed" ? (
+                  <form className="extension-panel" onSubmit={submitExtension}>
+                    <h4>Request a check-out extension</h4>
+                    <p className="muted-text">Requests require Associate Dean and Transit Manager review.</p>
+                    <label className="form-label" htmlFor="extensionDate">New check-out date and time</label>
+                    <input
+                      id="extensionDate"
+                      className="form-control mb-3"
+                      type="datetime-local"
+                      min={toLocalDateTimeInput(selectedBooking.checkOut)}
+                      value={extension.dateTime}
+                      onChange={(event) => setExtension((current) => ({ ...current, dateTime: event.target.value }))}
+                    />
+                    <label className="form-label" htmlFor="extensionReason">Reason</label>
+                    <textarea
+                      id="extensionReason"
+                      className="form-control"
+                      rows={3}
+                      value={extension.reason}
+                      onChange={(event) => setExtension((current) => ({ ...current, reason: event.target.value }))}
+                    />
+                    <button className="btn btn-primary mt-3" disabled={submittingExtension}>
+                      {submittingExtension ? "Submitting…" : "Submit extension"}
+                    </button>
+                  </form>
+                ) : null}
+              </>
+            ) : <div className="empty-state">Select a booking to see its details.</div>}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
+const ReviewTable = ({ title, items, kind, onDecision, busyId, errors, focusedId }) => {
+  const [reasons, setReasons] = useState({});
+  return (
+    <section className="mb-5">
+      <h3 className="mb-3">{title}</h3>
+      <div className="table-responsive">
+        <table className="table transit-table">
+          <thead><tr><th>Student / request</th><th>Details</th><th>Dates</th><th>Action</th></tr></thead>
+          <tbody>
+            {items.map((item) => (
+              <tr id={`${kind}-${item.id}`} key={item.id} className={focusedId === item.id ? "transit-review-focus" : ""}>
+                <td><div className="table-identity"><strong>{item.studentName || item.student_name}</strong><span>{item.studentEmail || item.student_email}</span></div></td>
+                <td>{kind === "booking"
+                  ? `${item.rollNumber || item.student_roll_number} · ${item.visitors.length} visitors · ${item.mobileNumber || item.contact_phone}`
+                  : item.reason}</td>
+                <td>{kind === "booking"
+                  ? `${formatTransitDateTime(item.checkIn || item.check_in)} – ${formatTransitDateTime(item.checkOut || item.check_out)}`
+                  : `Requested until ${formatTransitDateTime(item.requestedCheckOut || item.requested_check_out)}`}</td>
+                <td>
+                  {errors[item.id] ? <p className="field-error">{errors[item.id]}</p> : null}
+                  <div className="d-flex gap-2 flex-wrap">
+                    <button type="button" className="btn btn-success btn-sm" disabled={busyId === item.id} onClick={() => onDecision(item, "approve")}>Approve</button>
+                    <button type="button" className="btn btn-outline-danger btn-sm" disabled={busyId === item.id} onClick={() => onDecision(item, "deny", reasons[item.id] || "")}>Deny</button>
+                  </div>
+                  <textarea
+                    className="form-control form-control-sm mt-2"
+                    rows={2}
+                    placeholder="Required if denying"
+                    aria-label={`Denial reason for ${item.studentName || item.student_name}`}
+                    value={reasons[item.id] || ""}
+                    onChange={(event) => setReasons((current) => ({ ...current, [item.id]: event.target.value }))}
+                  />
+                </td>
+              </tr>
+            ))}
+            {!items.length ? <tr><td colSpan="4" className="empty-state-cell">No requests are waiting for review.</td></tr> : null}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+};
+
+const AssociateDeanDashboard = () => {
+  const { token } = useTransitAuth();
+  const location = useLocation();
+  const [bookings, setBookings] = useState([]);
+  const [extensions, setExtensions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [busyId, setBusyId] = useState("");
+  const [rowErrors, setRowErrors] = useState({});
+  const [refresh, setRefresh] = useState(0);
+  const focusedBookingId = new URLSearchParams(location.search).get("booking");
+  const focusedExtensionId = new URLSearchParams(location.search).get("extension");
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    Promise.all([
+      requestTransitApi("/admin/bookings", token),
+      requestTransitApi("/admin/extensions", token),
+    ]).then(([bookingResult, extensionResult]) => {
+      if (!active) return;
+      setBookings(bookingResult.bookings.map(normalizeBooking));
+      setExtensions(extensionResult.extensions.map(normalizeExtension));
+      setError("");
+    }).catch((requestError) => {
+      if (active) setError(requestError.message);
+    }).finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [token, refresh]);
+
+  useEffect(() => {
+    if (loading) return;
+    const focusId = focusedBookingId
+      ? `booking-${focusedBookingId}`
+      : focusedExtensionId ? `extension-${focusedExtensionId}` : "";
+    if (focusId) document.getElementById(focusId)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [loading, focusedBookingId, focusedExtensionId, bookings, extensions]);
+
+  const decide = async (item, kind, decision, reason) => {
+    if (decision === "deny" && !reason.trim()) {
+      setRowErrors((current) => ({ ...current, [item.id]: "Enter a reason before denying this request." }));
+      return;
+    }
+    setBusyId(item.id);
+    setError("");
+    setSuccess("");
+    setRowErrors((current) => ({ ...current, [item.id]: "" }));
+    try {
+      const path = kind === "booking"
+        ? `/admin/bookings/${item.id}/decision`
+        : `/admin/extensions/${item.id}/decision`;
+      const result = await requestTransitApi(path, token, {
+        method: "PATCH",
+        body: JSON.stringify(decision === "deny" ? { decision, reason: reason.trim() } : { decision }),
+      });
+      const outcome = `${kind === "booking" ? "Booking" : "Extension"} ${decision === "approve" ? "approved" : "denied"}.`;
+      setSuccess(result.emailNotification === "failed"
+        ? `${outcome} The email notification failed; contact the Transit office.`
+        : outcome);
+      setRefresh((value) => value + 1);
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setBusyId("");
+    }
+  };
+
+  return (
+    <div className="transit-dashboard admin-dashboard">
+      <div className="section-head mb-4"><div><span className="eyebrow">Associate Dean</span><h2>Approval queues</h2></div></div>
+      <Alert error={error} success={success} />
+      {loading ? <p>Loading requests…</p> : (
+        <>
+          <ReviewTable
+            title="Bookings"
+            items={bookings}
+            kind="booking"
+            busyId={busyId}
+            errors={rowErrors}
+            focusedId={focusedBookingId}
+            onDecision={(item, decision, reason) => decide(item, "booking", decision, reason)}
+          />
+          <ReviewTable
+            title="Extension requests"
+            items={extensions}
+            kind="extension"
+            busyId={busyId}
+            errors={rowErrors}
+            focusedId={focusedExtensionId}
+            onDecision={(item, decision, reason) => decide(item, "extension", decision, reason)}
+          />
+        </>
+      )}
+    </div>
+  );
+};
+
+const ManagerDashboard = () => {
+  const { token } = useTransitAuth();
+  const location = useLocation();
+  const [bookings, setBookings] = useState([]);
+  const [extensions, setExtensions] = useState([]);
+  const [roomInputs, setRoomInputs] = useState({});
+  const [denialReasons, setDenialReasons] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [busyId, setBusyId] = useState("");
+  const [refresh, setRefresh] = useState(0);
+  const focusedBookingId = new URLSearchParams(location.search).get("booking");
+  const focusedExtensionId = new URLSearchParams(location.search).get("extension");
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    Promise.all([
+      requestTransitApi("/manager/bookings", token),
+      requestTransitApi("/manager/extensions", token),
+    ]).then(([bookingResult, extensionResult]) => {
+      if (!active) return;
+      setBookings(bookingResult.bookings.map(normalizeBooking));
+      setExtensions(extensionResult.extensions.map(normalizeExtension));
+      setError("");
+    }).catch((requestError) => {
+      if (active) setError(requestError.message);
+    }).finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [token, refresh]);
+
+  useEffect(() => {
+    if (loading) return;
+    const focusId = focusedBookingId
+      ? `manager-booking-${focusedBookingId}`
+      : focusedExtensionId ? `manager-extension-${focusedExtensionId}` : "";
+    if (focusId) document.getElementById(focusId)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [loading, focusedBookingId, focusedExtensionId, bookings, extensions]);
+
+  const runAction = async (id, path, payload, message) => {
+    if (busyId) return;
+    setBusyId(id);
+    setError("");
+    setSuccess("");
+    try {
+      const result = await requestTransitApi(path, token, {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+      });
+      setSuccess(result.emailNotification === "failed"
+        ? `${message} The email notification failed; contact the Transit office.`
+        : message);
+      setRefresh((value) => value + 1);
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setBusyId("");
+    }
+  };
+
+  const confirmBooking = (booking) => {
+    const rooms = (roomInputs[booking.id] || "")
+      .split(",")
+      .map((room) => room.trim())
+      .filter(Boolean);
+    if (!rooms.length) {
+      setError("Enter one or more room numbers before confirming.");
+      return;
+    }
+    runAction(
+      booking.id,
+      `/manager/bookings/${booking.id}/confirm`,
+      { roomNumbers: rooms },
+      "Booking confirmed and confirmation email requested.",
+    );
+  };
+
+  const decideExtension = (extension, decision) => {
+    const reason = (denialReasons[extension.id] || "").trim();
+    if (decision === "deny" && !reason) {
+      setError("Enter a reason before denying an extension.");
+      return;
+    }
+    runAction(
+      extension.id,
+      `/manager/extensions/${extension.id}/decision`,
+      decision === "deny" ? { decision, reason } : { decision },
+      `Extension ${decision === "approve" ? "confirmed" : "denied"}.`,
+    );
+  };
+
+  return (
+    <div className="transit-dashboard manager-dashboard">
+      <div className="section-head mb-4"><div><span className="eyebrow">Transit Manager</span><h2>Confirmation queues</h2></div></div>
+      <Alert error={error} success={success} />
+      {loading ? <p>Loading requests…</p> : (
+        <>
+          <section>
+            <h3 className="mb-3">Bookings awaiting room allocation</h3>
+            <div className="manager-layout">
+              {bookings.map((booking) => (
+                <div
+                  id={`manager-booking-${booking.id}`}
+                  className={`manager-card ${focusedBookingId === booking.id ? "transit-review-focus" : ""}`}
+                  key={booking.id}
+                >
+                  <div className="manager-card-header">
+                    <div><strong>{booking.id.slice(0, 8)}</strong><p>{booking.studentName}</p></div>
+                    <Status status={booking.status} />
+                  </div>
+                  <div className="manager-meta"><span>{booking.mobileNumber}</span><span>Visitors: {booking.visitorCount}</span></div>
+                  <div className="booking-mini-grid">
+                    <div><label>Check-in</label><p>{formatTransitDateTime(booking.checkIn)}</p></div>
+                    <div><label>Check-out</label><p>{formatTransitDateTime(booking.checkOut)}</p></div>
+                  </div>
+                  <div className="visitor-mini-list compact-list">{booking.visitors.map((visitor, index) => (
+                    <div key={`${booking.id}-${index}`}><strong>{visitor.name}</strong><small>{visitor.relationship}</small></div>
+                  ))}</div>
+                  <div className="allocation-box">
+                    <label className="form-label" htmlFor={`rooms-${booking.id}`}>Room number(s), separated by commas</label>
+                    <input
+                      id={`rooms-${booking.id}`}
+                      className="form-control"
+                      value={roomInputs[booking.id] || ""}
+                      onChange={(event) => setRoomInputs((current) => ({ ...current, [booking.id]: event.target.value }))}
+                    />
+                    <button type="button" className="btn btn-primary mt-3" disabled={Boolean(busyId)} onClick={() => confirmBooking(booking)}>
+                      Confirm allocation
+                    </button>
+                    <label className="form-label mt-3" htmlFor={`booking-denial-${booking.id}`}>Denial reason</label>
+                    <textarea
+                      id={`booking-denial-${booking.id}`}
+                      className="form-control"
+                      rows={2}
+                      value={denialReasons[booking.id] || ""}
+                      onChange={(event) => setDenialReasons((current) => ({ ...current, [booking.id]: event.target.value }))}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-outline-danger btn-sm mt-2"
+                      disabled={Boolean(busyId)}
+                      onClick={() => {
+                        const reason = (denialReasons[booking.id] || "").trim();
+                        if (!reason) {
+                          setError("Enter a reason before denying a booking.");
+                          return;
+                        }
+                        runAction(booking.id, `/manager/bookings/${booking.id}/decision`, { decision: "deny", reason }, "Booking denied.");
+                      }}
+                    >Deny booking</button>
+                  </div>
+                </div>
+              ))}
+              {!bookings.length ? <div className="empty-state">No bookings are waiting for confirmation.</div> : null}
+            </div>
+          </section>
+          <section>
+            <h3 className="mb-3">Extensions awaiting final review</h3>
+            <div className="table-responsive">
+              <table className="table transit-table">
+                <thead><tr><th>Student</th><th>Reason</th><th>New check-out</th><th>Action</th></tr></thead>
+                <tbody>
+                  {extensions.map((extension) => (
+                    <tr
+                      id={`manager-extension-${extension.id}`}
+                      className={focusedExtensionId === extension.id ? "transit-review-focus" : ""}
+                      key={extension.id}
+                    >
+                      <td>{extension.studentName}</td>
+                      <td>{extension.reason}</td>
+                      <td>{formatTransitDateTime(extension.requestedCheckOut)}</td>
+                      <td>
+                        <button type="button" className="btn btn-success btn-sm me-2" disabled={Boolean(busyId)} onClick={() => decideExtension(extension, "approve")}>Confirm</button>
+                        <button type="button" className="btn btn-outline-danger btn-sm" disabled={Boolean(busyId)} onClick={() => decideExtension(extension, "deny")}>Deny</button>
+                        <textarea
+                          className="form-control form-control-sm mt-2"
+                          rows={2}
+                          aria-label={`Denial reason for ${extension.studentName}`}
+                          placeholder="Required if denying"
+                          value={denialReasons[extension.id] || ""}
+                          onChange={(event) => setDenialReasons((current) => ({ ...current, [extension.id]: event.target.value }))}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                  {!extensions.length ? <tr><td colSpan="4" className="empty-state-cell">No extensions are waiting for review.</td></tr> : null}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </>
+      )}
+    </div>
+  );
+};
+
+const BookingForm = () => {
+  const { token, user, termsVersion } = useTransitAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [formValues, setFormValues] = useState(() => ({
+    ...getInitialFormState(),
+    studentName: user.name,
+    rollNumber: user.email.split("@")[0],
+  }));
+  const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState("");
+  const [serverMessage, setServerMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const minDateValue = getMinBookingDate();
+  const acceptedTerms = location.state?.acceptedTerms === true;
 
   const handleVisitorCountChange = (event) => {
-    const nextCount = Number(event.target.value || 0);
-    setFormValues((current) => {
-      const nextVisitors = Array.from({ length: nextCount }, (_, index) => current.visitors[index] || createBlankVisitor());
-      return { ...current, visitorCount: nextCount, visitors: nextVisitors };
-    });
+    const count = Math.max(1, Number(event.target.value) || 1);
+    setFormValues((current) => ({
+      ...current,
+      visitors: Array.from({ length: count }, (_, index) => current.visitors[index] || createBlankVisitor()),
+    }));
   };
 
   const handleVisitorInput = (index, field, value) => {
     setFormValues((current) => ({
       ...current,
-      visitors: current.visitors.map((visitor, visitorIndex) =>
-        visitorIndex === index ? { ...visitor, [field]: value } : visitor
-      ),
+      visitors: current.visitors.map((visitor, visitorIndex) => visitorIndex === index
+        ? { ...visitor, [field]: value }
+        : visitor),
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const validation = validateBooking(formValues);
-
-    const filteredErrors = { ...validation };
-    delete filteredErrors.visitorList;
-    setErrors(filteredErrors);
-
-    if (Object.keys(filteredErrors).length > 0) {
-      setServerMessage("Please correct the highlighted fields before submitting the request.");
+    const nextErrors = {};
+    if (!/^\+?[0-9\s().-]{7,30}$/.test(formValues.contactPhone.trim())) {
+      nextErrors.contactPhone = "Enter a valid contact phone number.";
+    }
+    formValues.visitors.forEach((visitor, index) => {
+      if (!visitor.name.trim()) nextErrors[`visitorName-${index}`] = "Visitor name is required.";
+      if (!visitor.relationship.trim()) nextErrors[`visitorRelationship-${index}`] = "Relationship is required.";
+    });
+    const checkInLocal = formValues.checkInDate && formValues.checkInTime
+      ? new Date(`${formValues.checkInDate}T${formValues.checkInTime}`)
+      : null;
+    const checkOutLocal = formValues.checkOutDate && formValues.checkOutTime
+      ? new Date(`${formValues.checkOutDate}T${formValues.checkOutTime}`)
+      : null;
+    if (!formValues.checkInDate || !formValues.checkInTime) {
+      nextErrors.checkIn = "Check-in date and time are required.";
+    }
+    if (!formValues.checkOutDate || !formValues.checkOutTime) {
+      nextErrors.checkOut = "Check-out date and time are required.";
+    }
+    if (checkInLocal && checkInLocal.getTime() < Date.now() + 48 * 60 * 60 * 1000) {
+      nextErrors.checkIn = "Check-in must be at least 48 hours from now.";
+    }
+    if (checkInLocal && checkOutLocal && checkOutLocal <= checkInLocal) {
+      nextErrors.checkOut = "Check-out must be after check-in.";
+    }
+    if (!acceptedTerms && !formValues.termsAccepted) {
+      nextErrors.termsAccepted = "Accept the terms before submitting.";
+    }
+    setErrors(nextErrors);
+    setServerError("");
+    setServerMessage("");
+    if (Object.keys(nextErrors).length) return;
+    if (!termsVersion) {
+      setServerError("The current terms version could not be loaded. Sign in again before submitting.");
       return;
     }
 
-    const booking = {
-      id: `TF-${Math.floor(1000 + Math.random() * 9000)}`,
-      studentName: formValues.studentName.trim(),
-      rollNumber: formValues.rollNumber.trim(),
-      mobileNumber: formValues.mobileNumber.trim(),
-      visitorCount: Number(formValues.visitorCount),
-      visitors: formValues.visitors.slice(0, Number(formValues.visitorCount)),
-      checkIn: `${formValues.checkInDate}T${formValues.checkInTime}`,
-      checkOut: `${formValues.checkOutDate}T${formValues.checkOutTime}`,
-      status: "Pending",
-      submittedAt: new Date().toISOString(),
-      assignedRoom: "",
-      denialReason: "",
-    };
-
-    setServerMessage(`Booking ${booking.id} submitted successfully and is pending review.`);
-    setFormValues(getInitialFormState());
-    setErrors({});
-
-    setTimeout(() => navigate("/transit/student-dashboard"), 700);
+    setSubmitting(true);
+    try {
+      const result = await requestTransitApi("/bookings", token, {
+        method: "POST",
+        body: JSON.stringify({
+          contactPhone: formValues.contactPhone.trim(),
+          visitors: formValues.visitors.map((visitor) => ({
+            name: visitor.name.trim(),
+            relationship: visitor.relationship.trim(),
+          })),
+          checkIn: checkInLocal.toISOString(),
+          checkOut: checkOutLocal.toISOString(),
+          termsAccepted: acceptedTerms || formValues.termsAccepted,
+          termsVersion,
+        }),
+      });
+      setServerMessage(result.emailNotification === "failed"
+        ? `Booking ${result.booking.id.slice(0, 8)} was submitted, but the Associate Dean notification email failed. Please contact the office.`
+        : `Booking ${result.booking.id.slice(0, 8)} submitted for Associate Dean review.`);
+      setFormValues(getInitialFormState());
+    } catch (requestError) {
+      setServerError(requestError.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div className="transit-booking">
       <div className="section-head mb-4">
-        <div>
-          <span className="eyebrow">Student booking</span>
-          <h2>Book Transit Facility</h2>
-        </div>
+        <div><span className="eyebrow">Student booking</span><h2>Book Transit Facility</h2></div>
       </div>
-
+      <Alert error={serverError} success={serverMessage} />
       <form className="booking-form" onSubmit={handleSubmit} noValidate>
         <div className="form-section">
           <h3>Student information</h3>
+          <p className="muted-text">Signed in as {user.email}</p>
           <div className="row g-3">
-            <div className="col-md-4">
-              <label className="form-label">Student Name</label>
+            <div className="col-md-6">
+              <label className="form-label" htmlFor="studentName">Student name</label>
               <input
-                className={`form-control ${errors.studentName ? "is-invalid" : ""}`}
+                id="studentName"
+                className="form-control"
                 value={formValues.studentName}
-                onChange={(event) => setFormValues((current) => ({ ...current, studentName: event.target.value }))}
+                readOnly
               />
-              {errors.studentName ? <div className="field-error">{errors.studentName}</div> : null}
+              <small className="muted-text">Filled from your Google Workspace profile.</small>
             </div>
-            <div className="col-md-4">
-              <label className="form-label">Roll Number</label>
+            <div className="col-md-6">
+              <label className="form-label" htmlFor="rollNumber">Roll number</label>
               <input
-                className={`form-control ${errors.rollNumber ? "is-invalid" : ""}`}
+                id="rollNumber"
+                className="form-control"
                 value={formValues.rollNumber}
-                onChange={(event) => setFormValues((current) => ({ ...current, rollNumber: event.target.value }))}
+                readOnly
               />
-              {errors.rollNumber ? <div className="field-error">{errors.rollNumber}</div> : null}
-            </div>
-            <div className="col-md-4">
-              <label className="form-label">Mobile Number</label>
-              <input
-                className={`form-control ${errors.mobileNumber ? "is-invalid" : ""}`}
-                value={formValues.mobileNumber}
-                onChange={(event) => setFormValues((current) => ({ ...current, mobileNumber: event.target.value }))}
-              />
-              {errors.mobileNumber ? <div className="field-error">{errors.mobileNumber}</div> : null}
+              <small className="muted-text">Taken from the part of your IIT Dharwad email before @iitdh.ac.in.</small>
             </div>
           </div>
         </div>
-
+        <div className="form-section">
+          <h3>Contact information</h3>
+          <label className="form-label" htmlFor="contactPhone">Mobile number</label>
+          <input
+            id="contactPhone"
+            className={`form-control ${errors.contactPhone ? "is-invalid" : ""}`}
+            value={formValues.contactPhone}
+            onChange={(event) => setFormValues((current) => ({ ...current, contactPhone: event.target.value }))}
+          />
+          {errors.contactPhone ? <div className="field-error">{errors.contactPhone}</div> : null}
+        </div>
         <div className="form-section">
           <h3>Visitor information</h3>
-          <div className="row g-3 align-items-end">
-            <div className="col-md-5">
-              <label className="form-label">Number of visitors</label>
-              <input
-                type="number"
-                min="1"
-                className={`form-control ${errors.visitorCount ? "is-invalid" : ""}`}
-                value={formValues.visitorCount}
-                onChange={handleVisitorCountChange}
-              />
-              {errors.visitorCount ? <div className="field-error">{errors.visitorCount}</div> : null}
-            </div>
-          </div>
-
+          <label className="form-label" htmlFor="visitorCount">Number of visitors</label>
+          <input id="visitorCount" type="number" min="1" className="form-control" value={formValues.visitors.length} onChange={handleVisitorCountChange} />
           <div className="visitor-stack">
-            {Array.from({ length: Number(formValues.visitorCount || 0) }, (_, index) => (
+            {formValues.visitors.map((visitor, index) => (
               <div className="visitor-card" key={`visitor-${index}`}>
                 <h4>Visitor {index + 1}</h4>
                 <div className="row g-3">
                   <div className="col-md-6">
-                    <label className="form-label">Name</label>
+                    <label className="form-label" htmlFor={`visitor-name-${index}`}>Name</label>
                     <input
+                      id={`visitor-name-${index}`}
                       className={`form-control ${errors[`visitorName-${index}`] ? "is-invalid" : ""}`}
-                      value={formValues.visitors[index]?.name || ""}
+                      value={visitor.name}
                       onChange={(event) => handleVisitorInput(index, "name", event.target.value)}
                     />
                     {errors[`visitorName-${index}`] ? <div className="field-error">{errors[`visitorName-${index}`]}</div> : null}
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label">Relationship</label>
+                    <label className="form-label" htmlFor={`visitor-relationship-${index}`}>Relationship</label>
                     <input
+                      id={`visitor-relationship-${index}`}
                       className={`form-control ${errors[`visitorRelationship-${index}`] ? "is-invalid" : ""}`}
-                      value={formValues.visitors[index]?.relationship || ""}
+                      value={visitor.relationship}
                       onChange={(event) => handleVisitorInput(index, "relationship", event.target.value)}
                     />
                     {errors[`visitorRelationship-${index}`] ? <div className="field-error">{errors[`visitorRelationship-${index}`]}</div> : null}
@@ -769,123 +929,99 @@ const BookingForm = () => {
             ))}
           </div>
         </div>
-
         <div className="form-section">
           <h3>Booking dates</h3>
           <div className="row g-3">
-            <div className="col-md-3">
-              <label className="form-label">Check-in date</label>
+            <div className="col-md-6">
+              <label className="form-label" htmlFor="checkInDate">Check-in date</label>
               <input
+                id="checkInDate"
                 type="date"
                 min={minDateValue}
-                className={`form-control ${errors.checkInDate ? "is-invalid" : ""}`}
+                className={`form-control ${errors.checkIn ? "is-invalid" : ""}`}
                 value={formValues.checkInDate}
                 onChange={(event) => setFormValues((current) => ({ ...current, checkInDate: event.target.value }))}
               />
-              {errors.checkInDate ? <div className="field-error">{errors.checkInDate}</div> : null}
-            </div>
-            <div className="col-md-3">
-              <label className="form-label">Check-in time</label>
+              <label className="form-label mt-2" htmlFor="checkInTime">Check-in time</label>
               <input
+                id="checkInTime"
                 type="time"
-                className={`form-control ${errors.checkInTime ? "is-invalid" : ""}`}
+                className={`form-control ${errors.checkIn ? "is-invalid" : ""}`}
                 value={formValues.checkInTime}
                 onChange={(event) => setFormValues((current) => ({ ...current, checkInTime: event.target.value }))}
               />
-              {errors.checkInTime ? <div className="field-error">{errors.checkInTime}</div> : null}
+              {errors.checkIn ? <div className="field-error">{errors.checkIn}</div> : null}
             </div>
-            <div className="col-md-3">
-              <label className="form-label">Check-out date</label>
+            <div className="col-md-6">
+              <label className="form-label" htmlFor="checkOutDate">Check-out date</label>
               <input
+                id="checkOutDate"
                 type="date"
                 min={formValues.checkInDate || minDateValue}
-                className={`form-control ${errors.checkOutDate ? "is-invalid" : ""}`}
+                className={`form-control ${errors.checkOut ? "is-invalid" : ""}`}
                 value={formValues.checkOutDate}
                 onChange={(event) => setFormValues((current) => ({ ...current, checkOutDate: event.target.value }))}
               />
-              {errors.checkOutDate ? <div className="field-error">{errors.checkOutDate}</div> : null}
-            </div>
-            <div className="col-md-3">
-              <label className="form-label">Check-out time</label>
+              <label className="form-label mt-2" htmlFor="checkOutTime">Check-out time</label>
               <input
+                id="checkOutTime"
                 type="time"
-                className={`form-control ${errors.checkOutTime ? "is-invalid" : ""}`}
+                className={`form-control ${errors.checkOut ? "is-invalid" : ""}`}
                 value={formValues.checkOutTime}
                 onChange={(event) => setFormValues((current) => ({ ...current, checkOutTime: event.target.value }))}
               />
-              {errors.checkOutTime ? <div className="field-error">{errors.checkOutTime}</div> : null}
+              {errors.checkOut ? <div className="field-error">{errors.checkOut}</div> : null}
             </div>
           </div>
-
-          <div className="booking-rule-note mt-3">
-            <strong>48-hour booking rule:</strong> A booking request cannot be made within the next 48 hours from the current system time.
+          <div className="booking-rule-note mt-3"><strong>48-hour booking rule:</strong> The selected check-in date and time must be at least 48 hours ahead.</div>
+        </div>
+        <div className="form-section">
+          <div className="form-check terms-checkbox">
+            <input
+              id="bookingTerms"
+              className="form-check-input"
+              type="checkbox"
+              checked={acceptedTerms || formValues.termsAccepted}
+              disabled={acceptedTerms}
+              onChange={(event) => setFormValues((current) => ({ ...current, termsAccepted: event.target.checked }))}
+            />
+            <label className="form-check-label" htmlFor="bookingTerms">
+              I accept the <NavLink to="/transit/terms">Transit Facility terms and conditions</NavLink>.
+            </label>
           </div>
+          {errors.termsAccepted ? <div className="field-error">{errors.termsAccepted}</div> : null}
         </div>
-
         <div className="d-flex justify-content-between align-items-center form-actions">
-          <button type="button" className="btn btn-outline-secondary" onClick={() => navigate("/transit/terms")}>
-            Back to terms
-          </button>
-          <button type="submit" className="btn btn-primary btn-portal">
-            Submit booking
+          <button type="button" className="btn btn-outline-secondary" onClick={() => navigate("/transit/terms")}>Back to terms</button>
+          <button type="submit" className="btn btn-primary btn-portal" disabled={submitting}>
+            {submitting ? "Submitting…" : "Submit booking"}
           </button>
         </div>
-
-        {serverMessage ? <div className="alert alert-success mt-3">{serverMessage}</div> : null}
       </form>
     </div>
   );
 };
 
-const TransitLanding = () => (
-  <div className="transit-landing">
-    <div className="landing-hero">
-      <span className="eyebrow">IIT Dharwad Students&apos; Welfare</span>
-      <h1>Transit Facility Booking Portal</h1>
-      <p>
-        Manage student bookings, approvals, and room allocation in a role-based workflow designed to match the existing SW website.
-      </p>
-      <div className="landing-actions">
-        <NavLink to="/transit/terms" className="btn btn-primary btn-portal">
-          Student login
-        </NavLink>
-        <NavLink to="/transit/dean" className="btn btn-outline-primary btn-portal">
-          Associate Dean
-        </NavLink>
-        <NavLink to="/transit/manager" className="btn btn-outline-primary btn-portal">
-          Transit Manager
-        </NavLink>
-      </div>
-    </div>
-
-    <div className="feature-grid">
-      <div className="info-card">
-        <h3>Student flow</h3>
-        <p>Read and accept the T&amp;C, complete booking form, and track status updates.</p>
-      </div>
-      <div className="info-card">
-        <h3>Dean review</h3>
-        <p>Review pending requests, confirm visitor details, and approve or deny requests.</p>
-      </div>
-      <div className="info-card">
-        <h3>Manager allocation</h3>
-        <p>Assign rooms to approved bookings and keep check-in information ready.</p>
-      </div>
-    </div>
-  </div>
+const TransitPortalRoutes = () => (
+  <>
+    <TransitHeader />
+    <Routes>
+      <Route index element={<TransitLanding />} />
+      <Route path="terms" element={<RequireRole role="student"><TermsAndConditions /></RequireRole>} />
+      <Route path="student" element={<RequireRole role="student"><StudentDashboard /></RequireRole>} />
+      <Route path="student-dashboard" element={<Navigate to="/transit/student" replace />} />
+      <Route path="student/booking" element={<RequireRole role="student"><BookingForm /></RequireRole>} />
+      <Route path="dean" element={<RequireRole role="associate_dean"><AssociateDeanDashboard /></RequireRole>} />
+      <Route path="manager" element={<RequireRole role="transit_manager"><ManagerDashboard /></RequireRole>} />
+      <Route path="*" element={<Navigate to="/transit" replace />} />
+    </Routes>
+  </>
 );
 
 const TransitPortal = () => (
-  <Routes>
-    <Route path="/" element={<TransitLanding />} />
-    <Route path="/terms" element={<TermsAndConditions />} />
-    <Route path="/student" element={<StudentDashboard />} />
-    <Route path="/student-dashboard" element={<StudentDashboard />} />
-    <Route path="/student/booking" element={<BookingForm />} />
-    <Route path="/dean" element={<AssociateDeanDashboard />} />
-    <Route path="/manager" element={<ManagerDashboard />} />
-    <Route path="*" element={<Navigate to="/transit" replace />} />
-  </Routes>
+  <TransitAuthProvider>
+    <TransitPortalRoutes />
+  </TransitAuthProvider>
 );
 
 export default TransitPortal;
