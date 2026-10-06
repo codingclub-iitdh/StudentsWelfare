@@ -40,7 +40,7 @@ export default function AnimatedRoutes() {
 
       <Sidebar>
         {/* <AnimatePresence> */}
-        <Routes location={location} key={location.pathname}>
+        <Routes location={location}>
           <Route path="/" element={<Home />} />
           <Route path="/wellness-home" element={<WellnessHome />} />
           <Route

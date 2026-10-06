@@ -1,101 +1,61 @@
 const pad = (value) => String(value).padStart(2, "0");
 
-export const getRelativeDateTime = (days, hours) => {
-  const value = new Date();
-  value.setDate(value.getDate() + days);
-  value.setHours(hours, 0, 0, 0);
-  return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}T${pad(value.getHours())}:${pad(value.getMinutes())}`;
+export const getMinBookingDate = () => {
+  const minimumDate = new Date(Date.now() + 48 * 60 * 60 * 1000);
+  return `${minimumDate.getFullYear()}-${pad(minimumDate.getMonth() + 1)}-${pad(minimumDate.getDate())}`;
 };
 
-export const getMinBookingDate = () => {
-  const now = new Date();
-  return new Date(now.getTime() + 48 * 60 * 60 * 1000);
+export const getNextDate = (value) => {
+  const nextDate = new Date(`${value}T12:00:00`);
+  nextDate.setDate(nextDate.getDate() + 1);
+  return `${nextDate.getFullYear()}-${pad(nextDate.getMonth() + 1)}-${pad(nextDate.getDate())}`;
 };
 
 export const createBlankVisitor = () => ({ name: "", relationship: "" });
 
-export const createInitialBookings = () => [
-  {
-    id: "TF-1001",
-    studentName: "Aarav Sharma",
-    rollNumber: "B221020",
-    mobileNumber: "9876543210",
-    visitorCount: 2,
-    visitors: [
-      { name: "Meera Sharma", relationship: "Mother" },
-      { name: "Rohit Sharma", relationship: "Brother" },
-    ],
-    checkIn: getRelativeDateTime(3, 10),
-    checkOut: getRelativeDateTime(3, 18),
-    status: "Pending",
-    submittedAt: new Date().toISOString(),
-    assignedRoom: "",
-    denialReason: "",
-  },
-  {
-    id: "TF-1002",
-    studentName: "Aarav Sharma",
-    rollNumber: "B221020",
-    mobileNumber: "9876543210",
-    visitorCount: 1,
-    visitors: [{ name: "Aditi Sharma", relationship: "Sister" }],
-    checkIn: getRelativeDateTime(6, 9),
-    checkOut: getRelativeDateTime(6, 17),
-    status: "Approved",
-    submittedAt: new Date().toISOString(),
-    assignedRoom: "",
-    denialReason: "",
-  },
-  {
-    id: "TF-1003",
-    studentName: "Aarav Sharma",
-    rollNumber: "B221020",
-    mobileNumber: "9876543210",
-    visitorCount: 3,
-    visitors: [
-      { name: "Shivani Rao", relationship: "Mother" },
-      { name: "Raghav Rao", relationship: "Father" },
-      { name: "Nikhil Rao", relationship: "Brother" },
-    ],
-    checkIn: getRelativeDateTime(9, 12),
-    checkOut: getRelativeDateTime(10, 12),
-    status: "Allocated",
-    submittedAt: new Date().toISOString(),
-    assignedRoom: "D-214",
-    denialReason: "",
-  },
-  {
-    id: "TF-1004",
-    studentName: "Ishita Nair",
-    rollNumber: "B241015",
-    mobileNumber: "8123456789",
-    visitorCount: 1,
-    visitors: [{ name: "Nirmal Nair", relationship: "Father" }],
-    checkIn: getRelativeDateTime(12, 12),
-    checkOut: getRelativeDateTime(12, 19),
-    status: "Denied",
-    submittedAt: new Date().toISOString(),
-    assignedRoom: "",
-    denialReason: "Quota exhausted for the requested period.",
-  },
-];
-
 export const getInitialFormState = () => ({
-  studentName: "Aarav Sharma",
-  rollNumber: "B221020",
-  mobileNumber: "9876543210",
-  visitorCount: 2,
-  visitors: [
-    { name: "Meera Sharma", relationship: "Mother" },
-    { name: "Rohit Sharma", relationship: "Brother" },
-  ],
+  studentName: "",
+  rollNumber: "",
+  contactPhone: "",
+  visitors: [createBlankVisitor()],
   checkInDate: "",
   checkInTime: "",
   checkOutDate: "",
   checkOutTime: "",
+  termsAccepted: false,
 });
 
-export const addBooking = (bookings, booking) => [booking, ...bookings];
+export const formatTransitDate = (value, options = {}) => {
+  if (!value) return "—";
+  const dateValue = /^\d{4}-\d{2}-\d{2}$/.test(String(value))
+    ? `${value}T12:00:00`
+    : value;
+  const parsed = new Date(dateValue);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Kolkata",
+    ...options,
+  }).format(parsed);
+};
 
-export const updateBookingRecord = (bookings, bookingId, changes) =>
-  bookings.map((booking) => (booking.id === bookingId ? { ...booking, ...changes } : booking));
+export const formatTransitDateTime = (value) => formatTransitDate(value, {
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+export const toLocalDateTimeInput = (value) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+};
+
+export const getStatusLabel = (status) => ({
+  pending_dean: "Pending Associate Dean",
+  pending_manager: "Pending Transit Manager",
+  denied_by_dean: "Denied by Associate Dean",
+  denied_by_manager: "Denied by Transit Manager",
+  confirmed: "Confirmed",
+}[status] || status);
