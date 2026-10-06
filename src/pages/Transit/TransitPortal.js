@@ -25,6 +25,57 @@ const getStatusClass = (status) => {
   }
 };
 
+const BookingProgress = ({ booking }) => {
+  const isDenied = booking.status === "Denied";
+  const approvalState = isDenied
+    ? "denied"
+    : booking.status === "Pending"
+      ? "current"
+      : "complete";
+  const allocationState = booking.status === "Allocated"
+    ? "complete"
+    : booking.status === "Approved"
+      ? "current"
+      : "upcoming";
+  const steps = [
+    { label: "Submitted", state: "complete" },
+    { label: "Approved", state: approvalState },
+    { label: "Room allocated", state: allocationState },
+  ];
+  const nextAction = {
+    Pending: "Next: Your request is waiting for Associate Dean review.",
+    Approved: "Next: The Transit Manager needs to assign your room.",
+    Allocated: `Your room is assigned: ${booking.assignedRoom}.`,
+    Denied: "This request will not move to room allocation. Review the reason below or contact the Transit Office if you have questions.",
+  }[booking.status];
+
+  return (
+    <section className="booking-progress" aria-label={`Booking progress: ${booking.status}`}>
+      <h4>Request progress</h4>
+      <ol className="booking-progress-steps">
+        {steps.map((step, index) => (
+          <li
+            key={step.label}
+            className={`booking-progress-step is-${step.state}`}
+            aria-current={step.state === "current" ? "step" : undefined}
+          >
+            <span className="booking-progress-marker" aria-hidden="true">
+              {step.state === "denied" ? "!" : index + 1}
+            </span>
+            <span>{step.label}</span>
+          </li>
+        ))}
+      </ol>
+      <p className={`booking-next-action${isDenied ? " is-denied" : ""}`}>{nextAction}</p>
+      {isDenied ? (
+        <p className="booking-denial-reason">
+          <strong>Reason:</strong> {booking.denialReason || "No reason was provided."}
+        </p>
+      ) : null}
+    </section>
+  );
+};
+
 const formatDateTime = (value) => {
   if (!value) return "—";
   const parsed = new Date(value);
@@ -109,9 +160,7 @@ const validateBooking = (values) => {
   return { ...errors, visitorList };
 };
 
-const StudentDashboard = () => {
-  const [bookings, setBookings] = useState(createInitialBookings);
-  const [selectedBookingId, setSelectedBookingId] = useState("TF-1001");
+const StudentDashboard = ({ bookings, setBookings, selectedBookingId, setSelectedBookingId }) => {
   const [showExtension, setShowExtension] = useState(false);
   const [extensionDetails, setExtensionDetails] = useState({
     newCheckOutDate: "",
@@ -178,7 +227,7 @@ const StudentDashboard = () => {
           <span className="eyebrow">Student Portal</span>
           <h2>Transit Facility Dashboard</h2>
         </div>
-        <NavLink to="/transit/student/booking" className="btn btn-primary btn-portal">
+        <NavLink to="/transit/terms" className="btn btn-primary btn-portal">
           New Booking
         </NavLink>
       </div>
@@ -208,23 +257,25 @@ const StudentDashboard = () => {
             <h3>My bookings</h3>
           </div>
           <div className="booking-list">
-            {bookings.map((booking) => (
-              <button
-                type="button"
-                key={booking.id}
-                className={`booking-list-item ${selectedBookingId === booking.id ? "selected" : ""}`}
-                onClick={() => setSelectedBookingId(booking.id)}
-              >
-                <div className="booking-item-top">
-                  <span>{booking.id}</span>
-                  <span className={getStatusClass(booking.status)}>{booking.status}</span>
-                </div>
-                <p>
-                  {formatDate(booking.checkIn)} – {formatDate(booking.checkOut)}
-                </p>
-                <small>{booking.visitorCount} visitors</small>
-              </button>
-            ))}
+            {bookings.length ? bookings.map((booking) => (
+                <button
+                  type="button"
+                  key={booking.id}
+                  className={`booking-list-item ${selectedBooking?.id === booking.id ? "selected" : ""}`}
+                  onClick={() => setSelectedBookingId(booking.id)}
+                >
+                  <div className="booking-item-top">
+                    <span>{booking.id}</span>
+                    <span className={getStatusClass(booking.status)}>{booking.status}</span>
+                  </div>
+                  <p>
+                    {formatDate(booking.checkIn)} – {formatDate(booking.checkOut)}
+                  </p>
+                  <small>{booking.visitorCount} visitors</small>
+                </button>
+              )) : (
+                <div className="empty-state">You have no bookings yet. Start a new booking to track its status here.</div>
+              )}
           </div>
         </div>
 
@@ -240,6 +291,7 @@ const StudentDashboard = () => {
 
           {selectedBooking ? (
             <>
+              <BookingProgress booking={selectedBooking} />
               <div className="detail-grid">
                 <div>
                   <label>Booking ID</label>
@@ -338,8 +390,7 @@ const StudentDashboard = () => {
   );
 };
 
-const AssociateDeanDashboard = () => {
-  const [bookings, setBookings] = useState(createInitialBookings);
+const AssociateDeanDashboard = ({ bookings, setBookings }) => {
   const [confirmingId, setConfirmingId] = useState("" );
   const [denialReason, setDenialReason] = useState("");
   const [error, setError] = useState("");
@@ -480,8 +531,7 @@ const AssociateDeanDashboard = () => {
   );
 };
 
-const ManagerDashboard = () => {
-  const [bookings, setBookings] = useState(createInitialBookings);
+const ManagerDashboard = ({ bookings, setBookings }) => {
   const [roomInputs, setRoomInputs] = useState({});
 
   const approvedBookings = bookings.filter((booking) => booking.status === "Approved");
@@ -621,7 +671,7 @@ const TermsAndConditions = () => {
   );
 };
 
-const BookingForm = () => {
+const BookingForm = ({ onBookingSubmit }) => {
   const navigate = useNavigate();
   const [formValues, setFormValues] = useState(getInitialFormState());
   const [errors, setErrors] = useState({});
@@ -675,6 +725,7 @@ const BookingForm = () => {
       denialReason: "",
     };
 
+    onBookingSubmit(booking);
     setServerMessage(`Booking ${booking.id} submitted successfully and is pending review.`);
     setFormValues(getInitialFormState());
     setErrors({});
@@ -846,7 +897,7 @@ const TransitLanding = () => (
         Manage student bookings, approvals, and room allocation in a role-based workflow designed to match the existing SW website.
       </p>
       <div className="landing-actions">
-        <NavLink to="/transit/terms" className="btn btn-primary btn-portal">
+        <NavLink to="/transit/student-dashboard" className="btn btn-primary btn-portal">
           Student login
         </NavLink>
         <NavLink to="/transit/dean" className="btn btn-outline-primary btn-portal">
@@ -875,17 +926,33 @@ const TransitLanding = () => (
   </div>
 );
 
-const TransitPortal = () => (
-  <Routes>
-    <Route path="/" element={<TransitLanding />} />
-    <Route path="/terms" element={<TermsAndConditions />} />
-    <Route path="/student" element={<StudentDashboard />} />
-    <Route path="/student-dashboard" element={<StudentDashboard />} />
-    <Route path="/student/booking" element={<BookingForm />} />
-    <Route path="/dean" element={<AssociateDeanDashboard />} />
-    <Route path="/manager" element={<ManagerDashboard />} />
-    <Route path="*" element={<Navigate to="/transit" replace />} />
-  </Routes>
-);
+const TransitPortal = () => {
+  const [bookings, setBookings] = useState(createInitialBookings);
+  const [selectedBookingId, setSelectedBookingId] = useState("");
+
+  const handleBookingSubmit = (booking) => {
+    setBookings((currentBookings) => [booking, ...currentBookings]);
+    setSelectedBookingId(booking.id);
+  };
+
+  return (
+    <Routes>
+      <Route path="/" element={<TransitLanding />} />
+      <Route path="/terms" element={<TermsAndConditions />} />
+      <Route
+        path="/student"
+        element={<StudentDashboard bookings={bookings} setBookings={setBookings} selectedBookingId={selectedBookingId} setSelectedBookingId={setSelectedBookingId} />}
+      />
+      <Route
+        path="/student-dashboard"
+        element={<StudentDashboard bookings={bookings} setBookings={setBookings} selectedBookingId={selectedBookingId} setSelectedBookingId={setSelectedBookingId} />}
+      />
+      <Route path="/student/booking" element={<BookingForm onBookingSubmit={handleBookingSubmit} />} />
+      <Route path="/dean" element={<AssociateDeanDashboard bookings={bookings} setBookings={setBookings} />} />
+      <Route path="/manager" element={<ManagerDashboard bookings={bookings} setBookings={setBookings} />} />
+      <Route path="*" element={<Navigate to="/transit" replace />} />
+    </Routes>
+  );
+};
 
 export default TransitPortal;

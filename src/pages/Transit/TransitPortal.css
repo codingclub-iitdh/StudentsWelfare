@@ -287,6 +287,102 @@
   color: var(--transit-danger);
 }
 
+.booking-progress {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--transit-border);
+}
+
+.booking-progress h4 {
+  margin: 0 0 1rem;
+  color: var(--transit-navy);
+  font-size: 1rem;
+}
+
+.booking-progress-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.booking-progress-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--transit-gray);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.booking-progress-step:not(:last-child)::after {
+  position: absolute;
+  top: 0.75rem;
+  left: 50%;
+  z-index: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--transit-border);
+  content: "";
+}
+
+.booking-progress-marker {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  place-items: center;
+  border: 2px solid var(--transit-border);
+  border-radius: 50%;
+  background: var(--transit-card);
+  color: var(--transit-gray);
+  font-size: 0.7rem;
+}
+
+.booking-progress-step.is-complete .booking-progress-marker,
+.booking-progress-step.is-current .booking-progress-marker {
+  border-color: var(--transit-blue);
+  background: var(--transit-blue);
+  color: #ffffff;
+}
+
+.booking-progress-step.is-current,
+.booking-progress-step.is-complete {
+  color: var(--transit-navy);
+}
+
+.booking-progress-step.is-denied,
+.booking-progress-step.is-denied .booking-progress-marker {
+  color: var(--transit-danger);
+}
+
+.booking-progress-step.is-denied .booking-progress-marker {
+  border-color: var(--transit-danger);
+  background: var(--transit-danger-bg);
+}
+
+.booking-next-action,
+.booking-denial-reason {
+  margin: 1rem 0 0;
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--transit-blue);
+  color: var(--transit-navy);
+}
+
+.booking-next-action.is-denied,
+.booking-denial-reason {
+  border-left-color: var(--transit-danger);
+}
+
+.booking-denial-reason strong {
+  color: var(--transit-danger);
+}
+
 .extension-panel {
   margin-top: 1.25rem;
   border-top: 1px solid var(--transit-border);
