@@ -44,6 +44,7 @@ const Sidebar = ({ children }) => {
         { path: "/mess_canteen", label: "Mess & Canteen" },
         { path: "/gymkhana", label: "Gymkhana" },
         { path: "/swimming-pool", label: "Swimming Pool" },
+        { path: "/transit", label: "Transit Facility" },
       ],
     },
   ];

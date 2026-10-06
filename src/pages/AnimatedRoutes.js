@@ -22,6 +22,7 @@ import { Power3 } from "gsap";
 import Others from "./Others.js";
 import { AnimatePresence } from "framer-motion";
 import StudentAchievements from "./StudentAchievements/StudentAchievements.js";
+import TransitPortal from "./Transit/TransitPortal.js";
 
 // import StudentActivities from '../components/StudentActivities.js';
 // import Rti from '../components/Rti.js';
@@ -80,6 +81,7 @@ export default function AnimatedRoutes() {
             element={<AssociateDeanFaculty />}
           />
 
+          <Route path="/transit/*" element={<TransitPortal />} />
           <Route path="/others" element={<Others />} />
           <Route path="/counselling" element={<Counselling />} />
         </Routes>
