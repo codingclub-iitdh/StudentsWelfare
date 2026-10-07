@@ -21,6 +21,8 @@ Requirements: Node.js 20 or newer and a running PostgreSQL server/database.
    npm run db:migrate
    ```
 
+   Run this from `TransitBackend` against the same database configured for the API before deploying backend code that uses newer booking fields. This repeatable schema command adds missing booking columns, including `dean_note` and `manager_note`, to existing installations. If the API logs `column "dean_note" does not exist`, run this migration using the deployment's database configuration, then restart the API.
+
 5. Run the automated tests:
 
    ```powershell
@@ -76,23 +78,25 @@ All routes below require a valid Google ID token except `GET /health`. JSON date
 | Method and path | Role | Use |
 | --- | --- | --- |
 | `GET /api/me` | Any signed-in portal user | Return verified identity, role, and current `termsVersion`. |
-| `POST /api/bookings` | Student | Create a request. Body: `contactPhone`, `visitors` (array of `{name, relationship}`), ISO 8601 `checkIn` and `checkOut` date-times with timezone, `termsAccepted: true`, and current `termsVersion`. Student name comes from the verified Google profile; roll number is the email prefix before `@iitdh.ac.in`. Emails the Associate Dean an action-required notice with a protected link to the matching review queue. |
+| `POST /api/bookings` | Student | Create a request. Body: `contactPhone`, `visitors` (array of `{name, relationship}`), optional `note` (up to 2000 characters), ISO 8601 `checkIn` and `checkOut` date-times with timezone, `termsAccepted: true`, and current `termsVersion`. Student name comes from the verified Google profile; roll number is the email prefix before `@iitdh.ac.in`. Emails the Associate Dean an action-required notice with a protected link to the matching review queue. |
 | `GET /api/bookings` | Student | List only the signed-in student's bookings; optional `limit` and `offset`. |
 | `GET /api/bookings/:bookingId` | Student/Associate Dean/Transit Manager | Get a booking and its extension history. Students can only access their own. |
 | `POST /api/bookings/:bookingId/extensions` | Student | Request an extension. Body: ISO 8601 `requestedCheckOut` date-time with timezone and `reason`. |
 | `GET /api/extensions` | Student | List only the signed-in student's extension requests. |
 | `GET /api/extensions/:extensionId` | Student/Associate Dean/Transit Manager | Read an extension; students can only access their own. |
 | `GET /api/admin/bookings` | Associate Dean | List requests, defaulting to `pending_dean`; optional status, limit, and offset. |
-| `PATCH /api/admin/bookings/:bookingId/decision` | Associate Dean | Body: `{ "decision": "approve" }` or `{ "decision": "deny", "reason": "..." }`. Approval routes it to the Manager and emails the Transit Team an action-required notice with a protected queue link. |
+| `PATCH /api/admin/bookings/:bookingId/decision` | Associate Dean | Body: `{ "decision": "approve", "note": "optional note for the Manager" }` or `{ "decision": "deny", "reason": "..." }`. Approval routes it to the Manager and emails the Transit Team an action-required notice with a protected queue link, the student's note, and the Dean's optional note. |
 | `GET /api/manager/bookings` | Transit Manager | List requests awaiting room allocation and confirmation. |
-| `PATCH /api/manager/bookings/:bookingId/confirm` | Transit Manager | Body: `{ "roomNumbers": ["..."] }`; records allocation and emails the student, copying the configured Associate Dean, Transit Team, SW office, and C&S office addresses. |
+| `PATCH /api/manager/bookings/:bookingId/confirm` | Transit Manager | Body: `{ "roomAllocations": [{ "roomNumber": "...", "facilityBlock": "mess" or "transit", "occupancy": "single" or "double" }], "note": "optional note for the student" }`; records every room's block, occupancy, and applicable rate, then emails the student an itemized charge summary, copying the configured Associate Dean, Transit Team, SW office, and C&S office addresses. |
 | `PATCH /api/manager/bookings/:bookingId/decision` | Transit Manager | Deny an allocated-stage booking using `{ "decision": "deny", "reason": "..." }`. |
 | `GET /api/admin/extensions` | Associate Dean | List extension requests awaiting Dean review. |
 | `PATCH /api/admin/extensions/:extensionId/decision` | Associate Dean | Approve to route to Manager, or deny with a reason. |
 | `GET /api/manager/extensions` | Transit Manager | List extensions awaiting final review. |
 | `PATCH /api/manager/extensions/:extensionId/decision` | Transit Manager | Confirm or deny an extension; confirmation updates the original booking's check-out date. |
 
-Every new booking must be at least 48 hours ahead of the requested check-in date and time. Extension requests are allowed only for a currently active confirmed booking, at least 48 hours before its check-out time, and pass through Dean approval then Manager confirmation. Existing date-only booking rows are migrated to midnight in the configured `BOOKING_TIME_ZONE` by `npm run db:migrate`. Status changes and allocations are written to `status_history` and `audit_events` inside the same database transaction.
+Every new booking must be at least 48 hours ahead of the requested check-in date and time. Extension requests are allowed only for a currently active confirmed booking, at least 48 hours before its check-out time, and pass through Dean approval then Manager confirmation. `npm run db:migrate` upgrades existing installations with all booking columns used by the current application and migrates date-only booking rows to midnight in the configured `BOOKING_TIME_ZONE`. Status changes and allocations are written to `status_history` and `audit_events` inside the same database transaction.
+
+Students may include an optional note with their booking request. The Associate Dean can add an optional note for the Transit Manager when approving; it is included in the Manager's action-required email and review queue. The Transit Manager first chooses to confirm or deny. Confirming opens a per-room allocation form, where the block and occupancy are selected independently for every room; an optional note for the student is also available. Denying opens a required-reason form. Allocate at least `ceil(number of people / 2)` rooms, with enough combined capacity for the party. The confirmation email lists every room's block, occupancy, and applicable rate, plus the daily total. Rates per day (24 hours), excluding food, are Mess Block: Rs. 1,500 single / Rs. 2,000 double; Transit Facility: Rs. 2,000 single / Rs. 2,500 double. Charges are collected at check-in. Booking emails show check-in/check-out dates and times in readable India local time, without seconds.
 
 Email message subjects and plain-text bodies are centralized in `src/email-templates.js`. Booking and extension submissions notify the Associate Dean; Dean approvals notify the Transit Team; denials notify the student; and final booking confirmation emails the student with the configured CCs. Action-request links require an authorized Google sign-in, open the relevant request in the protected review queue, and never approve or deny directly. Email is sent after the database transaction commits. If delivery fails, the state change remains saved; the API response contains `"emailNotification": "failed"` and the server logs the delivery error so an operator can follow up. No payment processing, government-document uploads, room-inventory management, or digital physical check-in/check-out is implemented.
 

@@ -9,6 +9,7 @@ const {
   validateExtensionInput,
   validateDecision,
   validateRoomNumbers,
+  validateManagerConfirmation,
 } = require('../src/validation');
 
 test('date-only values must be real YYYY-MM-DD dates', () => {
@@ -44,6 +45,7 @@ test('booking validation requires student identity, visitors, times, phone, and 
   const valid = {
     contactPhone: '+91 98765 43210',
     visitors: [{ name: 'Visitor', relationship: 'Parent' }],
+    note: 'Please assign a quiet room if available.',
     checkIn: '2026-10-10T04:30:00.000Z',
     checkOut: '2026-10-12T12:30:00.000Z',
     termsAccepted: true,
@@ -59,6 +61,10 @@ test('booking validation requires student identity, visitors, times, phone, and 
     /at least one visitor/,
   );
   assert.throws(
+    () => validateBookingInput({ ...valid, note: 'x'.repeat(2001) }, '2026-10'),
+    /note must be at most 2000 characters/,
+  );
+  assert.throws(
     () => validateBookingInput({ ...valid, checkIn: '2026-10-10' }, '2026-10'),
     /ISO 8601/,
   );
@@ -71,6 +77,8 @@ test('extension dates and decision reasons are validated', () => {
   }));
   assert.throws(() => validateExtensionInput({ requestedCheckOut: '2026-02-30', reason: 'Reason' }));
   assert.doesNotThrow(() => validateDecision({ decision: 'approve' }));
+  assert.doesNotThrow(() => validateDecision({ decision: 'approve', note: 'Tell the manager about arrival.' }));
+  assert.throws(() => validateDecision({ decision: 'approve', note: 'x'.repeat(2001) }), /note must be at most 2000/);
   assert.throws(() => validateDecision({ decision: 'deny' }), /denial reason/);
 });
 
@@ -78,4 +86,59 @@ test('room allocation requires unique non-empty room names', () => {
   assert.deepEqual(validateRoomNumbers(['A-1', 'A-2']), ['A-1', 'A-2']);
   assert.throws(() => validateRoomNumbers(['A-1', 'a-1']), /duplicates/);
   assert.throws(() => validateRoomNumbers([]), /non-empty/);
+});
+
+test('manager confirmation validates each room, capacity, and its applicable daily rate', () => {
+  const allocations = [
+    { roomNumber: '304', facilityBlock: 'mess', occupancy: 'single', dailyRate: 1500 },
+    { roomNumber: '305', facilityBlock: 'transit', occupancy: 'double', dailyRate: 2500 },
+  ];
+  const result = validateManagerConfirmation({
+    roomAllocations: allocations.map(({ roomNumber, facilityBlock, occupancy }) => ({
+      roomNumber,
+      facilityBlock,
+      occupancy,
+    })),
+  }, 2);
+  assert.deepEqual(result.roomNumbers, ['304', '305']);
+  assert.deepEqual(result.roomAllocations, allocations);
+  assert.equal(result.dailyRate, 4000);
+  assert.equal(result.facilityBlock, null);
+  assert.equal(result.occupancy, null);
+
+  assert.throws(() => validateManagerConfirmation({
+    roomAllocations: [
+      { roomNumber: '304', facilityBlock: 'mess', occupancy: 'single' },
+    ],
+  }, 1), /at least 1 room.*enough occupancy/i);
+  assert.throws(() => validateManagerConfirmation({
+    roomAllocations: [
+      { roomNumber: '304', facilityBlock: 'invalid', occupancy: 'double' },
+    ],
+  }, 1), /Room 1 needs a valid facilityBlock/);
+  assert.throws(() => validateManagerConfirmation({
+    roomAllocations: [{ facilityBlock: 'mess', occupancy: 'double' }],
+  }, 1), /Room 1 needs a room number or name/);
+});
+
+test('manager confirmation accepts the previous roomNumbers payload during frontend/backend rollouts', () => {
+  const result = validateManagerConfirmation({
+    roomNumbers: ['304', '305'],
+    facilityBlock: 'mess',
+    occupancy: 'double',
+  }, 2);
+  assert.deepEqual(result.roomNumbers, ['304', '305']);
+  assert.equal(result.roomAllocations.length, 2);
+  assert.equal(result.dailyRate, 4000);
+});
+
+test('manager confirmation accepts common room number property aliases', () => {
+  const result = validateManagerConfirmation({
+    roomAllocations: [
+      { number: '304', facilityBlock: 'mess', occupancy: 'double' },
+      { roomNo: '305', facilityBlock: 'transit', occupancy: 'single' },
+    ],
+  }, 2);
+  assert.deepEqual(result.roomNumbers, ['304', '305']);
+  assert.deepEqual(result.roomAllocations.map(({ dailyRate }) => dailyRate), [2000, 2000]);
 });

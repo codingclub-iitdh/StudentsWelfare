@@ -431,6 +431,9 @@ const StudentDashboard = () => {
                   <div><label>Check-out</label><p>{formatTransitDateTime(selectedBooking.checkOut)}</p></div>
                   <div><label>Visitors</label><p>{selectedBooking.visitorCount}</p></div>
                   <div><label>Assigned room</label><p>{selectedBooking.assignedRoom || "Pending allocation"}</p></div>
+                  {selectedBooking.status === "confirmed" && selectedBooking.roomAllocations.length ? (
+                    <div><label>Room allocation</label><p>{selectedBooking.roomAllocations.map((room) => `${room.roomNumber}: ${room.facilityBlock === "mess" ? "Mess Block" : "Transit Facility"}, ${room.occupancy} occupancy`).join("; ")}</p></div>
+                  ) : null}
                 </div>
                 <div className="visitor-list-box">
                   <h4>Visitors</h4>
@@ -486,6 +489,27 @@ const StudentDashboard = () => {
 
 const ReviewTable = ({ title, items, kind, onDecision, busyId, errors, focusedId }) => {
   const [reasons, setReasons] = useState({});
+  const [reviewNotes, setReviewNotes] = useState({});
+  const [selectedDecisions, setSelectedDecisions] = useState({});
+  const [formErrors, setFormErrors] = useState({});
+
+  const submitDecision = (item) => {
+    const decision = selectedDecisions[item.id];
+    const reason = (reasons[item.id] || "").trim();
+    if (!decision) return;
+    if (decision === "deny" && !reason) {
+      setFormErrors((current) => ({ ...current, [item.id]: "A denial reason is required." }));
+      return;
+    }
+    setFormErrors((current) => ({ ...current, [item.id]: "" }));
+    onDecision(
+      item,
+      decision,
+      reason,
+      (reviewNotes[item.id] || "").trim(),
+    );
+  };
+
   return (
     <section className="mb-5">
       <h3 className="mb-3">{title}</h3>
@@ -496,26 +520,92 @@ const ReviewTable = ({ title, items, kind, onDecision, busyId, errors, focusedId
             {items.map((item) => (
               <tr id={`${kind}-${item.id}`} key={item.id} className={focusedId === item.id ? "transit-review-focus" : ""}>
                 <td><div className="table-identity"><strong>{item.studentName || item.student_name}</strong><span>{item.studentEmail || item.student_email}</span></div></td>
-                <td>{kind === "booking"
-                  ? `${item.rollNumber || item.student_roll_number} · ${item.visitors.length} visitors · ${item.mobileNumber || item.contact_phone}`
-                  : item.reason}</td>
+                <td>
+                  {kind === "booking" ? (
+                    <>
+                      <div>{item.rollNumber || item.student_roll_number} · {item.visitors.length} visitors · {item.mobileNumber || item.contact_phone}</div>
+                      {item.note ? <div className="booking-rule-note mt-2"><strong>Student note:</strong> {item.note}</div> : null}
+                    </>
+                  ) : item.reason}
+                </td>
                 <td>{kind === "booking"
                   ? `${formatTransitDateTime(item.checkIn || item.check_in)} – ${formatTransitDateTime(item.checkOut || item.check_out)}`
                   : `Requested until ${formatTransitDateTime(item.requestedCheckOut || item.requested_check_out)}`}</td>
                 <td>
                   {errors[item.id] ? <p className="field-error">{errors[item.id]}</p> : null}
-                  <div className="d-flex gap-2 flex-wrap">
-                    <button type="button" className="btn btn-success btn-sm" disabled={busyId === item.id} onClick={() => onDecision(item, "approve")}>Approve</button>
-                    <button type="button" className="btn btn-outline-danger btn-sm" disabled={busyId === item.id} onClick={() => onDecision(item, "deny", reasons[item.id] || "")}>Deny</button>
-                  </div>
-                  <textarea
-                    className="form-control form-control-sm mt-2"
-                    rows={2}
-                    placeholder="Required if denying"
-                    aria-label={`Denial reason for ${item.studentName || item.student_name}`}
-                    value={reasons[item.id] || ""}
-                    onChange={(event) => setReasons((current) => ({ ...current, [item.id]: event.target.value }))}
-                  />
+                  {!selectedDecisions[item.id] ? (
+                    <div className="d-flex gap-2 flex-wrap">
+                      <button
+                        type="button"
+                        className="btn btn-success btn-sm"
+                        disabled={busyId === item.id}
+                        onClick={() => {
+                          setSelectedDecisions((current) => ({ ...current, [item.id]: "approve" }));
+                          setFormErrors((current) => ({ ...current, [item.id]: "" }));
+                        }}
+                      >Approve</button>
+                      <button
+                        type="button"
+                        className="btn btn-outline-danger btn-sm"
+                        disabled={busyId === item.id}
+                        onClick={() => {
+                          setSelectedDecisions((current) => ({ ...current, [item.id]: "deny" }));
+                          setFormErrors((current) => ({ ...current, [item.id]: "" }));
+                        }}
+                      >Deny</button>
+                    </div>
+                  ) : (
+                    <div className="decision-form mt-2">
+                      {selectedDecisions[item.id] === "approve" ? (
+                        kind === "booking" ? (
+                          <>
+                            <label className="form-label" htmlFor={`review-note-${item.id}`}>Optional note for the Transit Manager</label>
+                            <textarea
+                              id={`review-note-${item.id}`}
+                              className="form-control form-control-sm"
+                              rows={2}
+                              maxLength={2000}
+                              value={reviewNotes[item.id] || ""}
+                              onChange={(event) => setReviewNotes((current) => ({ ...current, [item.id]: event.target.value }))}
+                            />
+                          </>
+                        ) : <p className="small mb-2">Approve this extension request?</p>
+                      ) : (
+                        <>
+                          <label className="form-label" htmlFor={`denial-reason-${item.id}`}>Denial reason (required)</label>
+                          <textarea
+                            id={`denial-reason-${item.id}`}
+                            className={`form-control form-control-sm ${formErrors[item.id] ? "is-invalid" : ""}`}
+                            rows={2}
+                            maxLength={2000}
+                            value={reasons[item.id] || ""}
+                            onChange={(event) => {
+                              setReasons((current) => ({ ...current, [item.id]: event.target.value }));
+                              setFormErrors((current) => ({ ...current, [item.id]: "" }));
+                            }}
+                          />
+                        </>
+                      )}
+                      {formErrors[item.id] ? <p className="field-error mt-1">{formErrors[item.id]}</p> : null}
+                      <div className="d-flex gap-2 mt-2">
+                        <button
+                          type="button"
+                          className={`btn btn-sm ${selectedDecisions[item.id] === "approve" ? "btn-success" : "btn-outline-danger"}`}
+                          disabled={busyId === item.id}
+                          onClick={() => submitDecision(item)}
+                        >Submit {selectedDecisions[item.id] === "approve" ? "approval" : "denial"}</button>
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary btn-sm"
+                          disabled={busyId === item.id}
+                          onClick={() => {
+                            setSelectedDecisions((current) => ({ ...current, [item.id]: "" }));
+                            setFormErrors((current) => ({ ...current, [item.id]: "" }));
+                          }}
+                        >Cancel</button>
+                      </div>
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}
@@ -566,7 +656,7 @@ const AssociateDeanDashboard = () => {
     if (focusId) document.getElementById(focusId)?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [loading, focusedBookingId, focusedExtensionId, bookings, extensions]);
 
-  const decide = async (item, kind, decision, reason) => {
+  const decide = async (item, kind, decision, reason, note = "") => {
     if (decision === "deny" && !reason.trim()) {
       setRowErrors((current) => ({ ...current, [item.id]: "Enter a reason before denying this request." }));
       return;
@@ -581,7 +671,9 @@ const AssociateDeanDashboard = () => {
         : `/admin/extensions/${item.id}/decision`;
       const result = await requestTransitApi(path, token, {
         method: "PATCH",
-        body: JSON.stringify(decision === "deny" ? { decision, reason: reason.trim() } : { decision }),
+        body: JSON.stringify(decision === "deny"
+          ? { decision, reason: reason.trim() }
+          : { decision, ...(kind === "booking" ? { note: note.trim() } : {}) }),
       });
       const outcome = `${kind === "booking" ? "Booking" : "Extension"} ${decision === "approve" ? "approved" : "denied"}.`;
       setSuccess(result.emailNotification === "failed"
@@ -630,8 +722,11 @@ const ManagerDashboard = () => {
   const location = useLocation();
   const [bookings, setBookings] = useState([]);
   const [extensions, setExtensions] = useState([]);
-  const [roomInputs, setRoomInputs] = useState({});
+  const [roomAllocations, setRoomAllocations] = useState({});
+  const [bookingDecisions, setBookingDecisions] = useState({});
+  const [confirmationNotes, setConfirmationNotes] = useState({});
   const [denialReasons, setDenialReasons] = useState({});
+  const [allocationErrors, setAllocationErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -687,18 +782,39 @@ const ManagerDashboard = () => {
   };
 
   const confirmBooking = (booking) => {
-    const rooms = (roomInputs[booking.id] || "")
-      .split(",")
-      .map((room) => room.trim())
-      .filter(Boolean);
-    if (!rooms.length) {
-      setError("Enter one or more room numbers before confirming.");
+    const allocations = roomAllocations[booking.id] || [];
+    const minimumRoomCount = Math.ceil((booking.visitorCount + 1) / 2);
+    const roomNames = allocations.map((room) => room.roomNumber.trim());
+    const totalCapacity = allocations.reduce((capacity, room) => (
+      capacity + (room.occupancy === "single" ? 1 : room.occupancy === "double" ? 2 : 0)
+    ), 0);
+    if (allocations.some((room) => !room.roomNumber.trim() || !room.facilityBlock || !room.occupancy)) {
+      setAllocationErrors((current) => ({ ...current, [booking.id]: "Enter a room number and select its block and occupancy for every room." }));
       return;
     }
+    if (new Set(roomNames.map((room) => room.toLowerCase())).size !== roomNames.length) {
+      setAllocationErrors((current) => ({ ...current, [booking.id]: "Room numbers must be unique." }));
+      return;
+    }
+    if (allocations.length < minimumRoomCount || totalCapacity < booking.visitorCount + 1) {
+      setAllocationErrors((current) => ({
+        ...current,
+        [booking.id]: `Assign at least ${minimumRoomCount} room(s) with enough occupancy for ${booking.visitorCount + 1} person(s).`,
+      }));
+      return;
+    }
+    setAllocationErrors((current) => ({ ...current, [booking.id]: "" }));
     runAction(
       booking.id,
       `/manager/bookings/${booking.id}/confirm`,
-      { roomNumbers: rooms },
+      {
+        roomAllocations: allocations.map((room) => ({
+          roomNumber: room.roomNumber.trim(),
+          facilityBlock: room.facilityBlock,
+          occupancy: room.occupancy,
+        })),
+        note: (confirmationNotes[booking.id] || "").trim(),
+      },
       "Booking confirmed and confirmation email requested.",
     );
   };
@@ -737,6 +853,7 @@ const ManagerDashboard = () => {
                     <Status status={booking.status} />
                   </div>
                   <div className="manager-meta"><span>{booking.mobileNumber}</span><span>Visitors: {booking.visitorCount}</span></div>
+                  <div className="manager-meta"><span>Total occupants: {booking.visitorCount + 1}</span></div>
                   <div className="booking-mini-grid">
                     <div><label>Check-in</label><p>{formatTransitDateTime(booking.checkIn)}</p></div>
                     <div><label>Check-out</label><p>{formatTransitDateTime(booking.checkOut)}</p></div>
@@ -744,39 +861,154 @@ const ManagerDashboard = () => {
                   <div className="visitor-mini-list compact-list">{booking.visitors.map((visitor, index) => (
                     <div key={`${booking.id}-${index}`}><strong>{visitor.name}</strong><small>{visitor.relationship}</small></div>
                   ))}</div>
-                  <div className="allocation-box">
-                    <label className="form-label" htmlFor={`rooms-${booking.id}`}>Room number(s), separated by commas</label>
-                    <input
-                      id={`rooms-${booking.id}`}
-                      className="form-control"
-                      value={roomInputs[booking.id] || ""}
-                      onChange={(event) => setRoomInputs((current) => ({ ...current, [booking.id]: event.target.value }))}
-                    />
-                    <button type="button" className="btn btn-primary mt-3" disabled={Boolean(busyId)} onClick={() => confirmBooking(booking)}>
-                      Confirm allocation
-                    </button>
-                    <label className="form-label mt-3" htmlFor={`booking-denial-${booking.id}`}>Denial reason</label>
-                    <textarea
-                      id={`booking-denial-${booking.id}`}
-                      className="form-control"
-                      rows={2}
-                      value={denialReasons[booking.id] || ""}
-                      onChange={(event) => setDenialReasons((current) => ({ ...current, [booking.id]: event.target.value }))}
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-outline-danger btn-sm mt-2"
-                      disabled={Boolean(busyId)}
-                      onClick={() => {
-                        const reason = (denialReasons[booking.id] || "").trim();
-                        if (!reason) {
-                          setError("Enter a reason before denying a booking.");
-                          return;
-                        }
-                        runAction(booking.id, `/manager/bookings/${booking.id}/decision`, { decision: "deny", reason }, "Booking denied.");
-                      }}
-                    >Deny booking</button>
-                  </div>
+                  {booking.note ? <div className="booking-rule-note mb-3"><strong>Student note:</strong> {booking.note}</div> : null}
+                  {booking.deanNote ? <div className="booking-rule-note mb-3"><strong>Associate Dean note:</strong> {booking.deanNote}</div> : null}
+                  {!bookingDecisions[booking.id] ? (
+                    <div className="allocation-box d-flex gap-2">
+                      <button
+                        type="button"
+                        className="btn btn-success"
+                        disabled={Boolean(busyId)}
+                        onClick={() => {
+                          setBookingDecisions((current) => ({ ...current, [booking.id]: "approve" }));
+                          setRoomAllocations((current) => ({
+                            ...current,
+                            [booking.id]: current[booking.id] || [{ roomNumber: "", facilityBlock: "", occupancy: "" }],
+                          }));
+                        }}
+                      >Confirm booking</button>
+                      <button
+                        type="button"
+                        className="btn btn-outline-danger"
+                        disabled={Boolean(busyId)}
+                        onClick={() => setBookingDecisions((current) => ({ ...current, [booking.id]: "deny" }))}
+                      >Deny booking</button>
+                    </div>
+                  ) : bookingDecisions[booking.id] === "approve" ? (
+                    <div className="allocation-box">
+                      <h4>Assign rooms</h4>
+                      <p className="muted-text">Assign at least {Math.ceil((booking.visitorCount + 1) / 2)} room(s) and enough room capacity for {booking.visitorCount + 1} person(s).</p>
+                      {(roomAllocations[booking.id] || []).map((room, index) => (
+                        <div className="visitor-card mb-3" key={`${booking.id}-room-${index}`}>
+                          <div className="d-flex justify-content-between align-items-center">
+                            <h5>Room {index + 1}</h5>
+                            {(roomAllocations[booking.id] || []).length > 1 ? (
+                              <button
+                                type="button"
+                                className="btn btn-outline-danger btn-sm"
+                                onClick={() => setRoomAllocations((current) => ({
+                                  ...current,
+                                  [booking.id]: current[booking.id].filter((_, roomIndex) => roomIndex !== index),
+                                }))}
+                              >Remove room</button>
+                            ) : null}
+                          </div>
+                          <label className="form-label" htmlFor={`room-number-${booking.id}-${index}`}>Room number</label>
+                          <input
+                            id={`room-number-${booking.id}-${index}`}
+                            className="form-control mb-2"
+                            value={room.roomNumber}
+                            onChange={(event) => setRoomAllocations((current) => ({
+                              ...current,
+                              [booking.id]: current[booking.id].map((allocation, roomIndex) => roomIndex === index
+                                ? { ...allocation, roomNumber: event.target.value }
+                                : allocation),
+                            }))}
+                          />
+                          <div className="row g-2">
+                            <div className="col-md-6">
+                              <label className="form-label" htmlFor={`room-block-${booking.id}-${index}`}>Facility block</label>
+                              <select
+                                id={`room-block-${booking.id}-${index}`}
+                                className="form-select"
+                                value={room.facilityBlock}
+                                onChange={(event) => setRoomAllocations((current) => ({
+                                  ...current,
+                                  [booking.id]: current[booking.id].map((allocation, roomIndex) => roomIndex === index
+                                    ? { ...allocation, facilityBlock: event.target.value }
+                                    : allocation),
+                                }))}
+                              >
+                                <option value="">Select block</option>
+                                <option value="mess">Mess Block</option>
+                                <option value="transit">Transit Facility</option>
+                              </select>
+                            </div>
+                            <div className="col-md-6">
+                              <label className="form-label" htmlFor={`room-occupancy-${booking.id}-${index}`}>Occupancy</label>
+                              <select
+                                id={`room-occupancy-${booking.id}-${index}`}
+                                className="form-select"
+                                value={room.occupancy}
+                                onChange={(event) => setRoomAllocations((current) => ({
+                                  ...current,
+                                  [booking.id]: current[booking.id].map((allocation, roomIndex) => roomIndex === index
+                                    ? { ...allocation, occupancy: event.target.value }
+                                    : allocation),
+                                }))}
+                              >
+                                <option value="">Select occupancy</option>
+                                <option value="single">Single occupancy</option>
+                                <option value="double">Double occupancy</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        className="btn btn-outline-primary btn-sm"
+                        onClick={() => setRoomAllocations((current) => ({
+                          ...current,
+                          [booking.id]: [...(current[booking.id] || []), { roomNumber: "", facilityBlock: "", occupancy: "" }],
+                        }))}
+                      >Add another room</button>
+                      <label className="form-label d-block mt-3" htmlFor={`confirmation-note-${booking.id}`}>Note to student (optional)</label>
+                      <textarea
+                        id={`confirmation-note-${booking.id}`}
+                        className="form-control"
+                        rows={2}
+                        maxLength={2000}
+                        value={confirmationNotes[booking.id] || ""}
+                        onChange={(event) => setConfirmationNotes((current) => ({ ...current, [booking.id]: event.target.value }))}
+                      />
+                      {allocationErrors[booking.id] ? <p className="field-error mt-2">{allocationErrors[booking.id]}</p> : null}
+                      <div className="d-flex gap-2 mt-3">
+                        <button type="button" className="btn btn-primary" disabled={Boolean(busyId)} onClick={() => confirmBooking(booking)}>Submit allocation</button>
+                        <button type="button" className="btn btn-outline-secondary" disabled={Boolean(busyId)} onClick={() => setBookingDecisions((current) => ({ ...current, [booking.id]: "" }))}>Cancel</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="allocation-box">
+                      <label className="form-label" htmlFor={`booking-denial-${booking.id}`}>Denial reason (required)</label>
+                      <textarea
+                        id={`booking-denial-${booking.id}`}
+                        className="form-control"
+                        rows={2}
+                        maxLength={2000}
+                        value={denialReasons[booking.id] || ""}
+                        onChange={(event) => setDenialReasons((current) => ({ ...current, [booking.id]: event.target.value }))}
+                      />
+                      <div className="d-flex gap-2 mt-3">
+                        <button
+                          type="button"
+                          className="btn btn-outline-danger"
+                          disabled={Boolean(busyId)}
+                          onClick={() => {
+                            const reason = (denialReasons[booking.id] || "").trim();
+                            if (!reason) {
+                              setAllocationErrors((current) => ({ ...current, [booking.id]: "A denial reason is required." }));
+                              return;
+                            }
+                            setAllocationErrors((current) => ({ ...current, [booking.id]: "" }));
+                            runAction(booking.id, `/manager/bookings/${booking.id}/decision`, { decision: "deny", reason }, "Booking denied.");
+                          }}
+                        >Submit denial</button>
+                        <button type="button" className="btn btn-outline-secondary" disabled={Boolean(busyId)} onClick={() => setBookingDecisions((current) => ({ ...current, [booking.id]: "" }))}>Cancel</button>
+                      </div>
+                      {allocationErrors[booking.id] ? <p className="field-error mt-2">{allocationErrors[booking.id]}</p> : null}
+                    </div>
+                  )}
                 </div>
               ))}
               {!bookings.length ? <div className="empty-state">No bookings are waiting for confirmation.</div> : null}
@@ -830,6 +1062,7 @@ const BookingForm = () => {
     ...getInitialFormState(),
     studentName: user.name,
     rollNumber: user.email.split("@")[0],
+    note: "",
   }));
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
@@ -903,6 +1136,7 @@ const BookingForm = () => {
             name: visitor.name.trim(),
             relationship: visitor.relationship.trim(),
           })),
+          note: formValues.note.trim(),
           checkIn: checkInLocal.toISOString(),
           checkOut: checkOutLocal.toISOString(),
           termsAccepted: acceptedTerms || formValues.termsAccepted,
@@ -1000,6 +1234,19 @@ const BookingForm = () => {
               </div>
             ))}
           </div>
+        </div>
+        <div className="form-section">
+          <h3>Note (optional)</h3>
+          <label className="form-label" htmlFor="bookingNote">Anything the Transit team should know?</label>
+          <textarea
+            id="bookingNote"
+            className="form-control"
+            rows={3}
+            maxLength={2000}
+            value={formValues.note}
+            onChange={(event) => setFormValues((current) => ({ ...current, note: event.target.value }))}
+          />
+          <small className="muted-text">Up to 2000 characters.</small>
         </div>
         <div className="form-section">
           <h3>Booking dates</h3>

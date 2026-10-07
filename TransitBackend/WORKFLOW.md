@@ -35,8 +35,9 @@ Denial requires a reason. A request already actioned cannot be actioned again.
 
 The Manager reviews the approved request, requested stay, contact details and visitor list against the room-inventory ledger maintained offline. The portal does not maintain room inventory.
 
-- The Manager enters one or more room numbers and confirms the booking; or denies it with a reason.
-- Confirmation changes the status to `confirmed`, saves the allocated rooms, and sends the student a confirmation email.
+- The Manager first chooses to confirm or deny. Denying opens a required-reason form. Confirming opens a per-room form: enter each room number and select Mess Block or Transit Facility and single or double occupancy for that room.
+- Allocate at least `ceil(number of people / 2)` rooms and ensure combined room capacity covers the full party. The Manager may add an optional note for the student before submitting the allocation.
+- Confirmation changes the status to `confirmed`, saves the room-by-room allocations and applicable daily rates, and sends the student an itemized confirmation email.
 - The confirmation email CCs the configured Associate Dean, Transit Facility Team, SW Office and C&S Office addresses. `TRANSIT_TEAM_EMAIL` may be set to a team mailbox; if omitted, it defaults to `TRANSIT_MANAGER_EMAIL`.
 - If email delivery fails after the database transaction commits, the saved booking remains confirmed; the API reports the email failure for operator follow-up.
 
@@ -58,7 +59,7 @@ Visitor identity verification, payment, room inventory, occupancy decisions, and
 1. Create a PostgreSQL database and configure `TransitBackend/.env` from the backend `.env.example`.
 2. Configure the same Google OAuth Web Client ID as `GOOGLE_CLIENT_ID` in the backend and `REACT_APP_GOOGLE_CLIENT_ID` in the root frontend `.env`. Set the frontend API origin with `REACT_APP_TRANSIT_API_URL`.
 3. Set the Associate Dean and Manager allowlisted addresses, SW and C&S office addresses, SMTP values, and (if distinct) `TRANSIT_TEAM_EMAIL`.
-4. Run `npm run db:migrate` in `TransitBackend` before starting the backend. The schema command also upgrades existing date-only booking timestamps to midnight Asia/Kolkata and adds the roll-number column.
+4. Run `npm run db:migrate` in `TransitBackend` against the same database used by the backend before deploying/restarting it. The repeatable schema command adds missing booking columns (including `dean_note` and `manager_note`), upgrades existing date-only booking timestamps to midnight Asia/Kolkata, and adds the roll-number column. If the API reports a missing booking column, apply this migration and restart the backend.
 5. Start the backend and frontend, sign in with an authorized account, and exercise booking, approval, room-allocation and extension flows.
 
 Do not commit either `.env` file or its credentials. The root `.gitignore` excludes environment files and keeps `.env.example` templates trackable.

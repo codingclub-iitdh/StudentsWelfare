@@ -61,6 +61,9 @@ function fakeClient({ bookingStatus = 'pending_dean' } = {}) {
     check_in: '2026-10-10',
     check_out: '2026-10-12',
     room_numbers: [],
+    note: 'Please assign a quiet room if available.',
+    dean_note: '',
+    manager_note: '',
   };
   return {
     calls,
@@ -71,13 +74,19 @@ function fakeClient({ bookingStatus = 'pending_dean' } = {}) {
       if (sql.includes('SELECT * FROM booking_requests WHERE id = $1 FOR UPDATE')) {
         return { rows: [{ ...booking }], rowCount: 1 };
       }
-      if (sql.includes('UPDATE booking_requests SET status = $2')) {
+      if (sql.includes('UPDATE booking_requests') && sql.includes('SET status = $2')) {
         booking.status = params[1];
+        booking.dean_note = params[2];
         return { rows: [{ ...booking }], rowCount: 1 };
       }
       if (sql.includes("UPDATE booking_requests") && sql.includes("SET status = 'confirmed'")) {
         booking.status = 'confirmed';
         booking.room_numbers = params[1];
+        booking.facility_block = params[2];
+        booking.occupancy = params[3];
+        booking.daily_rate = params[4];
+        booking.manager_note = params[5];
+        booking.room_allocations = JSON.parse(params[6]);
         return { rows: [{ ...booking }], rowCount: 1 };
       }
       if (sql.includes('INSERT INTO status_history') || sql.includes('INSERT INTO audit_events')) {
@@ -237,6 +246,7 @@ test('booking creation stores student details and timezone-aware requested stay'
             visitors: JSON.parse(params[5]),
             check_in: params[6],
             check_out: params[7],
+            note: params[9],
           }],
           rowCount: 1,
         };
@@ -265,6 +275,7 @@ test('booking creation stores student details and timezone-aware requested stay'
         rollNumber: 'B221020',
         contactPhone: '+91 98765 43210',
         visitors: [{ name: 'Visitor', relationship: 'Parent' }],
+        note: 'Please assign a quiet room if available.',
         checkIn: checkIn.toISOString(),
         checkOut: checkOut.toISOString(),
         termsAccepted: true,
@@ -278,14 +289,18 @@ test('booking creation stores student details and timezone-aware requested stay'
     assert.equal(result.booking.student_roll_number, 'student');
     assert.equal(result.booking.check_in, checkIn.toISOString());
     assert.equal(result.booking.check_out, checkOut.toISOString());
+    assert.equal(result.booking.note, 'Please assign a quiet room if available.');
     const insert = calls.find(({ sql }) => sql.includes('INSERT INTO booking_requests'));
     assert.match(insert.sql, /student_roll_number/);
     assert.equal(insert.params[2], 'Test User');
     assert.equal(insert.params[3], 'student');
+    assert.equal(insert.params[9], 'Please assign a quiet room if available.');
     assert.equal(result.emailNotification, 'sent');
     assert.equal(messages.length, 1);
     assert.equal(messages[0].to, 'dean@iitdh.ac.in');
     assert.match(messages[0].subject, /action required/i);
+    assert.match(messages[0].subject, /visitor/i);
+    assert.match(messages[0].text, /STUDENT NOTE\nPlease assign a quiet room if available\./);
     assert.match(messages[0].text, new RegExp(`http://localhost:3000/transit/dean\\?booking=${bookingIdForCreation}`));
   });
 });
@@ -303,7 +318,7 @@ test('Dean approval emails the Transit Team with the protected manager queue lin
     const response = await fetch(`${url}/api/admin/bookings/${bookingId}/decision`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ decision: 'approve' }),
+      body: JSON.stringify({ decision: 'approve', note: 'Please verify the late arrival.' }),
     });
     const result = await response.json();
     assert.equal(response.status, 200);
@@ -312,12 +327,17 @@ test('Dean approval emails the Transit Team with the protected manager queue lin
     assert.equal(messages.length, 1);
     assert.equal(messages[0].to, 'transit-team@iitdh.ac.in');
     assert.match(messages[0].subject, /action required/i);
+    assert.match(messages[0].subject, /10 Oct 2026 - 1 visitor/i);
+    assert.match(messages[0].text, /STUDENT NOTE\nPlease assign a quiet room if available\./);
+    assert.match(messages[0].text, /ASSOCIATE DEAN NOTE FOR TRANSIT MANAGER\nPlease verify the late arrival\./);
+    assert.equal(result.booking.dean_note, 'Please verify the late arrival.');
     assert.match(messages[0].text, new RegExp(`http://localhost:3000/transit/manager\\?booking=${bookingId}`));
   });
 });
 
 test('Manager confirmation emails the student and copies the configured offices and team', async () => {
   const client = fakeClient({ bookingStatus: 'pending_manager' });
+  client.booking.dean_note = 'Please verify the late arrival.';
   const messages = [];
   const app = createApp({
     pool: fakePool(client),
@@ -329,7 +349,14 @@ test('Manager confirmation emails the student and copies the configured offices 
     const response = await fetch(`${url}/api/manager/bookings/${bookingId}/confirm`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ roomNumbers: ['A-1', 'A-2'] }),
+      body: JSON.stringify({
+        roomAllocations: [{
+          roomNumber: '304',
+          facilityBlock: 'mess',
+          occupancy: 'double',
+        }],
+        note: 'The room is on the third floor.',
+      }),
     });
     const result = await response.json();
     assert.equal(response.status, 200);
@@ -344,7 +371,15 @@ test('Manager confirmation emails the student and copies the configured offices 
       'cs@iitdh.ac.in',
     ]);
     assert.match(messages[0].subject, /confirmed/i);
-    assert.match(messages[0].text, /A-1, A-2/);
+    assert.match(messages[0].subject, /10 Oct 2026 - 1 visitor/i);
+    assert.match(messages[0].text, /Room 304 - Mess Block, Double occupancy: Rs\. 2,000 per day/);
+    assert.match(messages[0].text, /Total staying charges: Rs\. 2,000 per day/);
+    assert.match(messages[0].text, /Check-in: 10 October 2026 at 5:30 am/i);
+    assert.match(messages[0].text, /YOUR NOTE\nPlease assign a quiet room if available\./);
+    assert.match(messages[0].text, /ASSOCIATE DEAN NOTE\nPlease verify the late arrival\./);
+    assert.match(messages[0].text, /TRANSIT MANAGER NOTE\nThe room is on the third floor\./);
+    assert.equal(result.booking.daily_rate, 2000);
+    assert.equal(result.booking.manager_note, 'The room is on the third floor.');
   });
 });
 

@@ -13,7 +13,15 @@ CREATE TABLE IF NOT EXISTS booking_requests (
     terms_accepted BOOLEAN NOT NULL CHECK (terms_accepted = TRUE),
     terms_version TEXT NOT NULL,
     terms_accepted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    note TEXT NOT NULL DEFAULT '',
+    dean_note TEXT NOT NULL DEFAULT '',
+    manager_note TEXT NOT NULL DEFAULT '',
     room_numbers TEXT[] NOT NULL DEFAULT '{}',
+    room_allocations JSONB NOT NULL DEFAULT '[]'::jsonb
+        CHECK (jsonb_typeof(room_allocations) = 'array'),
+    facility_block TEXT CHECK (facility_block IN ('mess', 'transit')),
+    occupancy TEXT CHECK (occupancy IN ('single', 'double')),
+    daily_rate INTEGER CHECK (daily_rate > 0),
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CHECK (check_out > check_in)
@@ -34,6 +42,20 @@ CREATE TABLE IF NOT EXISTS extension_requests (
 
 ALTER TABLE booking_requests
     ADD COLUMN IF NOT EXISTS student_roll_number TEXT NOT NULL DEFAULT '';
+ALTER TABLE booking_requests
+    ADD COLUMN IF NOT EXISTS note TEXT NOT NULL DEFAULT '';
+ALTER TABLE booking_requests
+    ADD COLUMN IF NOT EXISTS dean_note TEXT NOT NULL DEFAULT '';
+ALTER TABLE booking_requests
+    ADD COLUMN IF NOT EXISTS manager_note TEXT NOT NULL DEFAULT '';
+ALTER TABLE booking_requests
+    ADD COLUMN IF NOT EXISTS room_allocations JSONB NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE booking_requests
+    ADD COLUMN IF NOT EXISTS facility_block TEXT CHECK (facility_block IN ('mess', 'transit'));
+ALTER TABLE booking_requests
+    ADD COLUMN IF NOT EXISTS occupancy TEXT CHECK (occupancy IN ('single', 'double'));
+ALTER TABLE booking_requests
+    ADD COLUMN IF NOT EXISTS daily_rate INTEGER CHECK (daily_rate > 0);
 
 DO $migration$
 BEGIN

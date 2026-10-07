@@ -6,7 +6,7 @@ const {
   validateBookingInput,
   validateExtensionInput,
   validateDecision,
-  validateRoomNumbers,
+  validateManagerConfirmation,
 } = require('./validation');
 const { requireRole } = require('./auth');
 const {
@@ -101,8 +101,8 @@ function createApiRouter({ pool, config, mailer }) {
       const result = await client.query(
         `INSERT INTO booking_requests
            (student_sub, student_email, student_name, student_roll_number, contact_phone, visitors,
-            check_in, check_out, terms_accepted, terms_version)
-         VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::timestamptz, $8::timestamptz, TRUE, $9)
+              check_in, check_out, terms_accepted, terms_version, note)
+           VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::timestamptz, $8::timestamptz, TRUE, $9, $10)
          RETURNING *`,
         [
           req.user.sub,
@@ -117,6 +117,7 @@ function createApiRouter({ pool, config, mailer }) {
           req.body.checkIn,
           req.body.checkOut,
           config.termsVersion,
+          (req.body.note || '').trim(),
         ],
       );
       const created = result.rows[0];
@@ -141,6 +142,7 @@ function createApiRouter({ pool, config, mailer }) {
         visitorCount: booking.visitors.length,
         checkIn: dateTimeString(booking.check_in),
         checkOut: dateTimeString(booking.check_out),
+        studentNote: booking.note,
         actionUrl: reviewUrl(config, '/transit/dean', 'booking', booking.id),
       }),
     }, { entity: 'booking', id: booking.id, notification: 'dean-action-required' });
@@ -328,9 +330,12 @@ function createApiRouter({ pool, config, mailer }) {
       if (!current) throw new HttpError(404, 'Booking not found.');
       if (current.status !== 'pending_dean') throw new HttpError(409, 'This booking is no longer awaiting Associate Dean review.');
       const updated = await client.query(
-        `UPDATE booking_requests SET status = $2, updated_at = CURRENT_TIMESTAMP
+        `UPDATE booking_requests
+         SET status = $2,
+             dean_note = CASE WHEN $2 = 'pending_manager' THEN $3 ELSE dean_note END,
+             updated_at = CURRENT_TIMESTAMP
          WHERE id = $1 RETURNING *`,
-        [id, nextStatus],
+        [id, nextStatus, (req.body.note || '').trim()],
       );
       await logStatus(client, {
         entityType: 'booking',
@@ -351,6 +356,9 @@ function createApiRouter({ pool, config, mailer }) {
         ...bookingDenied({
           reviewer: 'Associate Dean',
           reason: req.body.reason.trim(),
+          studentName: booking.student_name,
+          checkIn: dateTimeString(booking.check_in),
+          visitorCount: booking.visitors.length,
         }),
       }, { entity: 'booking', id, notification: 'dean-denial' });
     } else {
@@ -364,6 +372,8 @@ function createApiRouter({ pool, config, mailer }) {
           visitorCount: booking.visitors.length,
           checkIn: dateTimeString(booking.check_in),
           checkOut: dateTimeString(booking.check_out),
+          studentNote: booking.note,
+          reviewerNote: booking.dean_note,
           actionUrl: reviewUrl(config, '/transit/manager', 'booking', booking.id),
         }),
       }, { entity: 'booking', id, notification: 'manager-action-required' });
@@ -413,6 +423,9 @@ function createApiRouter({ pool, config, mailer }) {
       ...bookingDenied({
         reviewer: 'Transit Manager',
         reason: req.body.reason.trim(),
+        studentName: booking.student_name,
+        checkIn: dateTimeString(booking.check_in),
+        visitorCount: booking.visitors.length,
       }),
     }, { entity: 'booking', id, notification: 'manager-denial' });
     res.json(withNotification({ booking }, res));
@@ -420,17 +433,27 @@ function createApiRouter({ pool, config, mailer }) {
 
   router.patch('/manager/bookings/:bookingId/confirm', requireRole('transit_manager'), asyncHandler(async (req, res) => {
     const id = requireUuid(req.params.bookingId, 'bookingId');
-    const roomNumbers = validateRoomNumbers(req.body && req.body.roomNumbers);
     const booking = await withTransaction(pool, async (client) => {
       const found = await client.query('SELECT * FROM booking_requests WHERE id = $1 FOR UPDATE', [id]);
       const current = found.rows[0];
       if (!current) throw new HttpError(404, 'Booking not found.');
       if (current.status !== 'pending_manager') throw new HttpError(409, 'This booking is no longer awaiting Transit Manager review.');
+      const allocation = validateManagerConfirmation(req.body, current.visitors.length);
       const updated = await client.query(
         `UPDATE booking_requests
-         SET status = 'confirmed', room_numbers = $2::text[], updated_at = CURRENT_TIMESTAMP
+         SET status = 'confirmed', room_numbers = $2::text[], facility_block = $3,
+             occupancy = $4, daily_rate = $5, manager_note = $6,
+             room_allocations = $7::jsonb, updated_at = CURRENT_TIMESTAMP
          WHERE id = $1 RETURNING *`,
-        [id, roomNumbers],
+        [
+          id,
+          allocation.roomNumbers,
+          allocation.facilityBlock,
+          allocation.occupancy,
+          allocation.dailyRate,
+          allocation.note,
+          JSON.stringify(allocation.roomAllocations),
+        ],
       );
       await logStatus(client, {
         entityType: 'booking',
@@ -439,7 +462,10 @@ function createApiRouter({ pool, config, mailer }) {
         toStatus: 'confirmed',
         actor: req.user,
         eventType: 'booking.confirmed',
-        metadata: { roomNumbers },
+        metadata: {
+          roomAllocations: allocation.roomAllocations,
+          dailyRate: allocation.dailyRate,
+        },
       });
       return updated.rows[0];
     });
@@ -451,6 +477,14 @@ function createApiRouter({ pool, config, mailer }) {
         checkIn: dateTimeString(booking.check_in),
         checkOut: dateTimeString(booking.check_out),
         roomNumbers: booking.room_numbers,
+        roomAllocations: booking.room_allocations,
+        facilityBlock: booking.facility_block,
+        occupancy: booking.occupancy,
+        dailyRate: booking.daily_rate,
+        visitorCount: booking.visitors.length,
+        studentNote: booking.note,
+        reviewerNote: booking.dean_note,
+        managerNote: booking.manager_note,
       }),
     }, { entity: 'booking', id, notification: 'booking-confirmation' });
     res.json(withNotification({ booking }, res));

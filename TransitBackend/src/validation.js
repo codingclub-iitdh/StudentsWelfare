@@ -74,6 +74,10 @@ function validateBookingInput(body, termsVersion) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     throw new HttpError(400, 'Request body must be a JSON object.');
   }
+  if (body.note !== undefined
+    && (typeof body.note !== 'string' || body.note.length > 2000)) {
+    throw new HttpError(400, 'note must be at most 2000 characters.');
+  }
   if (!validatePhone(body.contactPhone)) {
     throw new HttpError(400, 'contactPhone must be a valid phone number.');
   }
@@ -117,6 +121,10 @@ function validateDecision(body) {
     || !['approve', 'deny'].includes(body.decision)) {
     throw new HttpError(400, 'decision must be "approve" or "deny".');
   }
+  if (body.note !== undefined
+    && (typeof body.note !== 'string' || body.note.length > 2000)) {
+    throw new HttpError(400, 'note must be at most 2000 characters.');
+  }
   if (body.decision === 'deny'
     && (typeof body.reason !== 'string' || !body.reason.trim() || body.reason.trim().length > 2000)) {
     throw new HttpError(400, 'A denial reason is required and must be at most 2000 characters.');
@@ -135,6 +143,76 @@ function validateRoomNumbers(value) {
   return rooms;
 }
 
+function validateManagerConfirmation(body, visitorCount) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    throw new HttpError(400, 'Request body must be a JSON object.');
+  }
+  const submittedRooms = Array.isArray(body.roomAllocations) && body.roomAllocations.length
+    ? body.roomAllocations
+    : Array.isArray(body.roomNumbers)
+      ? body.roomNumbers
+      : null;
+  if (!submittedRooms || submittedRooms.length === 0) {
+    throw new HttpError(400, 'roomAllocations must contain at least one room.');
+  }
+  const roomAllocations = submittedRooms.map((submittedRoom, index) => {
+    const room = typeof submittedRoom === 'string'
+      ? {
+        roomNumber: submittedRoom,
+        facilityBlock: body.facilityBlock,
+        occupancy: body.occupancy,
+      }
+      : submittedRoom;
+    const roomNumber = room && (
+      room.roomNumber
+      || room.roomNo
+      || room.number
+      || room.name
+    );
+    if (typeof roomNumber !== 'string' || !roomNumber.trim() || roomNumber.trim().length > 80) {
+      throw new HttpError(400, `Room ${index + 1} needs a room number or name.`);
+    }
+    const facilityBlock = room.facilityBlock || body.facilityBlock;
+    const occupancy = room.occupancy || body.occupancy;
+    if (!['mess', 'transit'].includes(facilityBlock)
+      || !['single', 'double'].includes(occupancy)) {
+      throw new HttpError(400, `Room ${index + 1} needs a valid facilityBlock and occupancy.`);
+    }
+    const dailyRate = {
+      mess: { single: 1500, double: 2000 },
+      transit: { single: 2000, double: 2500 },
+    }[facilityBlock][occupancy];
+    return {
+      roomNumber: roomNumber.trim(),
+      facilityBlock,
+      occupancy,
+      dailyRate,
+    };
+  });
+  const roomNumbers = validateRoomNumbers(roomAllocations.map((room) => room.roomNumber));
+  const peopleCount = visitorCount + 1;
+  const minimumRoomCount = Math.ceil(peopleCount / 2);
+  const totalCapacity = roomAllocations.reduce(
+    (capacity, room) => capacity + (room.occupancy === 'single' ? 1 : 2),
+    0,
+  );
+  if (roomAllocations.length < minimumRoomCount || totalCapacity < peopleCount) {
+    throw new HttpError(400, `Assign at least ${minimumRoomCount} room(s) and enough occupancy for ${peopleCount} person(s).`);
+  }
+  if (body.note !== undefined
+    && (typeof body.note !== 'string' || body.note.length > 2000)) {
+    throw new HttpError(400, 'note must be at most 2000 characters.');
+  }
+  return {
+    roomAllocations,
+    roomNumbers,
+    facilityBlock: roomAllocations.length === 1 ? roomAllocations[0].facilityBlock : null,
+    occupancy: roomAllocations.length === 1 ? roomAllocations[0].occupancy : null,
+    dailyRate: roomAllocations.reduce((total, room) => total + room.dailyRate, 0),
+    note: (body.note || '').trim(),
+  };
+}
+
 module.exports = {
   isDateOnly,
   isTimestamp,
@@ -144,4 +222,5 @@ module.exports = {
   validateExtensionInput,
   validateDecision,
   validateRoomNumbers,
+  validateManagerConfirmation,
 };
