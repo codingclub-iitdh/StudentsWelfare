@@ -279,6 +279,13 @@ const TermsAndConditions = () => {
             <li>Only authenticated IIT Dharwad student information may be used when creating a request.</li>
             <li>Room availability and allocation are managed offline by the Transit Facility team.</li>
             <li>No online payment gateway or government ID upload is part of this portal.</li>
+            <li>Charges are applicable per day rate as given below and payment has to be made at the time of check in.</li>
+            <li>Mess Block: Single occupancy – ₹1,500/-; Double occupancy – ₹2,000/-</li>
+            <li>Transit Facility: Single occupancy – ₹2,000/-; Double occupancy – ₹2,500/-</li>
+            <li>Food is not included in the charges. If required, one can use the existing hostel/canteen/transit facility. In case of food to be taken at the transit facility, book the same at its reception in advance.</li>
+            <li>Visitors should strictly adhere to the check-out time. If extension is required, it can be requested through the portal well in advance. The extension will be provided by the Transit Facility team based on availability and approval.</li>
+            <li>Booking in connection with events related to the Institute, academic, research, and CDC will take priority over individual requests.</li>
+            <li>For any additional information, get in touch with the reception desk at Transit Facility or SW Office.</li>
           </ul>
         </div>
         <div className="form-check terms-checkbox">
@@ -1058,17 +1065,42 @@ const BookingForm = () => {
   const { token, user, termsVersion } = useTransitAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [formValues, setFormValues] = useState(() => ({
-    ...getInitialFormState(),
-    studentName: user.name,
-    rollNumber: user.email.split("@")[0],
-    note: "",
-  }));
+  const bookingDraftKey = "transit-booking-draft";
+  const readStoredDraft = () => {
+    try {
+      const rawValue = sessionStorage.getItem(bookingDraftKey);
+      if (!rawValue) return null;
+      return JSON.parse(rawValue);
+    } catch {
+      return null;
+    }
+  };
+
+  const [formValues, setFormValues] = useState(() => {
+    const storedDraft = readStoredDraft();
+    const initialState = {
+      ...getInitialFormState(),
+      studentName: user.name,
+      rollNumber: user.email.split("@")[0],
+      note: "",
+    };
+    if (!storedDraft) return initialState;
+    return {
+      ...initialState,
+      ...storedDraft,
+      studentName: storedDraft.studentName || user.name,
+      rollNumber: storedDraft.rollNumber || user.email.split("@")[0],
+    };
+  });
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const minDateValue = getMinBookingDate();
   const acceptedTerms = location.state?.acceptedTerms === true;
+
+  useEffect(() => {
+    sessionStorage.setItem(bookingDraftKey, JSON.stringify(formValues));
+  }, [bookingDraftKey, formValues]);
 
   const handleVisitorCountChange = (event) => {
     const count = Math.max(1, Number(event.target.value) || 1);
@@ -1143,6 +1175,7 @@ const BookingForm = () => {
           termsVersion,
         }),
       });
+      sessionStorage.removeItem(bookingDraftKey);
       const successMessage = result.emailNotification === "failed"
         ? `Booking ${result.booking.id.slice(0, 8)} was submitted, but the Associate Dean notification email failed. Please contact the office.`
         : `Booking ${result.booking.id.slice(0, 8)} submitted for Associate Dean review.`;

@@ -25,6 +25,12 @@
   padding: 2rem 0 3rem;
 }
 
+.admin-dashboard {
+  background: linear-gradient(180deg, rgba(15, 31, 61, 0.03), rgba(21, 73, 138, 0.02));
+  border-radius: 24px;
+  padding: 1.25rem;
+}
+
 .transit-dashboard {
   display: flex;
   flex-direction: column;
@@ -72,6 +78,53 @@
   background: linear-gradient(135deg, rgba(29, 78, 216, 0.06), rgba(148, 163, 184, 0.04));
 }
 
+.admin-dashboard .section-head {
+  border: 1px solid rgba(133, 25, 142, 0.18);
+  background: linear-gradient(135deg, #4c0f5a 0%, #85198e 52%, #a21caf 100%);
+  box-shadow: 0 18px 36px rgba(133, 25, 142, 0.18);
+}
+
+.admin-dashboard .section-head h2,
+.admin-dashboard .section-head .eyebrow {
+  color: #ffffff;
+}
+
+.admin-dashboard .section-head .eyebrow {
+  color: #f7d7a3;
+}
+
+.transit-dashboard:not(.admin-dashboard) .section-head {
+  border: 1px solid rgba(133, 25, 142, 0.14);
+  background: linear-gradient(135deg, rgba(76, 15, 90, 0.9) 0%, rgba(133, 25, 142, 0.88) 48%, rgba(49, 46, 129, 0.9) 100%);
+  box-shadow: 0 14px 28px rgba(88, 28, 135, 0.12);
+}
+
+.transit-dashboard:not(.admin-dashboard) .section-head h2 {
+  color: #ffffff;
+}
+
+.transit-dashboard:not(.admin-dashboard) .eyebrow {
+  color: #f59e0b;
+}
+
+.transit-booking .eyebrow {
+  color: #d97706;
+}
+
+.transit-dashboard:not(.admin-dashboard) .btn-portal {
+  background: linear-gradient(135deg, #f59e0b, #ea8f00);
+  border-color: #f59e0b;
+  color: #ffffff;
+  box-shadow: 0 12px 22px rgba(245, 158, 11, 0.2);
+}
+
+.transit-dashboard:not(.admin-dashboard) .btn-portal:hover,
+.transit-dashboard:not(.admin-dashboard) .btn-portal:focus {
+  background: linear-gradient(135deg, #ea8f00, #d97706);
+  border-color: #ea8f00;
+  color: #ffffff;
+}
+
 .eyebrow {
   display: inline-block;
   font-size: 0.72rem;
@@ -80,6 +133,31 @@
   color: var(--transit-blue);
   font-weight: 700;
   margin-bottom: 0.5rem;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #198754, #1fa66a);
+  border-color: #198754;
+  box-shadow: 0 8px 18px rgba(25, 135, 84, 0.18);
+}
+
+.btn-success:hover,
+.btn-success:focus {
+  background: linear-gradient(135deg, #146c43, #198754);
+  border-color: #146c43;
+}
+
+.btn-outline-danger {
+  border-color: var(--transit-danger);
+  color: var(--transit-danger);
+  background: #ffffff;
+}
+
+.btn-outline-danger:hover,
+.btn-outline-danger:focus {
+  background: var(--transit-danger);
+  border-color: var(--transit-danger);
+  color: #ffffff;
 }
 
 .section-head h2,
@@ -105,38 +183,83 @@
 }
 
 .overview-card {
-  background: var(--transit-card);
-  border: 1px solid var(--transit-border);
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.96), rgba(255, 255, 255, 0.98));
+  border: 1px solid rgba(148, 163, 184, 0.25);
   border-radius: 18px;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.overview-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
 }
 
 .overview-card span {
   font-size: 0.8rem;
-  color: var(--transit-gray);
+  color: #2f3c5b;
   text-transform: uppercase;
-  letter-spacing: 0.06rem;
+  letter-spacing: 0.08rem;
+  font-weight: 700;
 }
 
 .overview-card strong {
   font-size: 2rem;
-  color: var(--transit-navy);
+  color: #111827;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.overview-card:not(.accent-warn):not(.accent-success):not(.accent-info) {
+  background: linear-gradient(135deg, #f8f5ff 0%, #eef4ff 100%);
+  border-color: rgba(109, 90, 191, 0.22);
+}
+
+.overview-card:not(.accent-warn):not(.accent-success):not(.accent-info) span {
+  color: #473b7a;
 }
 
 .accent-warn {
-  background: var(--transit-warn-bg);
+  background: linear-gradient(135deg, #fff2e6 0%, #f8e2c9 100%);
+  border-color: rgba(234, 143, 0, 0.22);
+}
+
+.accent-warn span {
+  color: #8d4a00;
+}
+
+.accent-warn strong {
+  color: #3b1f12;
 }
 
 .accent-success {
-  background: var(--transit-success-bg);
+  background: linear-gradient(135deg, #edfef2 0%, #d7f5df 100%);
+  border-color: rgba(16, 185, 129, 0.22);
+}
+
+.accent-success span {
+  color: #0f6f55;
+}
+
+.accent-success strong {
+  color: #11372d;
 }
 
 .accent-info {
-  background: var(--transit-info-bg);
+  background: linear-gradient(135deg, #edf6ff 0%, #dfeeff 100%);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.accent-info span {
+  color: #1d4f8f;
+}
+
+.accent-info strong {
+  color: #12345b;
 }
 
 .booking-layout {
@@ -442,15 +565,53 @@
 }
 
 .transit-review-focus {
-  outline: 3px solid var(--transit-navy);
+  outline: 3px solid rgba(245, 158, 11, 0.55);
   outline-offset: -3px;
-  background: var(--transit-highlight, #fff8df);
+  background: linear-gradient(135deg, #fffaf0, #f8f2fd);
+  box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.28);
+}
+
+.admin-dashboard .transit-review-focus {
+  outline: 3px solid rgba(245, 158, 11, 0.55);
+  outline-offset: -3px;
+  background: linear-gradient(135deg, #fffaf0, #f8f2fd);
+  box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.28);
 }
 
 .table-identity {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+}
+
+.transit-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-dashboard .transit-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid var(--transit-border);
+  box-shadow: 0 12px 30px rgba(15, 31, 61, 0.04);
+}
+
+.admin-dashboard .transit-table thead th {
+  background: linear-gradient(180deg, #4c0f5a 0%, #85198e 100%);
+  color: #ffffff !important;
+  font-weight: 700;
+  letter-spacing: 0.08rem;
+}
+
+.transit-table tbody tr {
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.transit-table tbody tr:hover {
+  background: rgba(234, 244, 255, 0.7);
 }
 
 .table-identity strong,
@@ -490,7 +651,9 @@
 }
 
 .manager-card {
-  padding: 1.1rem;
+  padding: 1.2rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border: 1px solid rgba(21, 73, 138, 0.12);
 }
 
 .manager-card-header {
@@ -499,6 +662,8 @@
   align-items: flex-start;
   gap: 0.5rem;
   margin-bottom: 0.9rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--transit-border);
 }
 
 .manager-card-header p {
@@ -538,7 +703,18 @@
 .transit-terms,
 .transit-booking {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 2rem;
+}
+
+.booking-form {
+  width: min(1000px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.5rem 0 0;
 }
 
 .terms-card {
@@ -569,6 +745,10 @@
 
 .form-section {
   padding: 1.3rem 1.25rem;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 18px;
+  background: linear-gradient(135deg, #f8f5ff 0%, #f3f9ff 100%);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.02);
 }
 
 .form-section h3 {
@@ -585,8 +765,8 @@
 }
 
 .visitor-card {
-  border: 1px solid var(--transit-border);
-  background: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: linear-gradient(135deg, #f8f5ff 0%, #f3f9ff 100%);
   border-radius: 12px;
   padding: 1rem;
 }
@@ -601,8 +781,15 @@
   margin-top: 1rem;
   padding: 0.9rem 1rem;
   border-radius: 12px;
-  background: #eff6ff;
-  color: var(--transit-blue);
+  background: rgba(255, 166, 0, 0.08);
+  color: rgba(180, 98, 0, 0.9);
+  border: 1px solid rgba(245, 158, 11, 0.18);
+}
+
+.admin-dashboard .booking-rule-note {
+  background: linear-gradient(135deg, #fff7ed, #f9f1ff);
+  color: #8b5e1b;
+  border: 1px solid rgba(245, 158, 11, 0.22);
 }
 
 .field-error {
