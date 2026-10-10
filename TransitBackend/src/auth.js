@@ -1,10 +1,16 @@
 const { OAuth2Client } = require('google-auth-library');
 const { HttpError } = require('./errors');
 
+function resolvePortalRole(email, hostedDomain, config) {
+  const normalizedEmail = email.toLowerCase();
+  if (normalizedEmail === config.associateDeanEmail) return 'associate_dean';
+  if (normalizedEmail === config.transitManagerEmail) return 'transit_manager';
+  if (normalizedEmail.endsWith('@iitdh.ac.in') && hostedDomain === 'iitdh.ac.in') return 'student';
+  return null;
+}
+
 function createGoogleAuthenticator(config) {
   const client = new OAuth2Client(config.googleClientId);
-  const deanEmails = new Set([config.associateDeanEmail]);
-  const managerEmails = new Set([config.transitManagerEmail]);
 
   return async function authenticate(req, res, next) {
     const authorization = req.get('authorization') || '';
@@ -22,10 +28,7 @@ function createGoogleAuthenticator(config) {
         throw new HttpError(403, 'A verified Google account is required.');
       }
 
-      let role = null;
-      if (deanEmails.has(email)) role = 'associate_dean';
-      else if (managerEmails.has(email)) role = 'transit_manager';
-      else if (email.endsWith('@iitdh.ac.in') && payload.hd === 'iitdh.ac.in') role = 'student';
+      const role = resolvePortalRole(email, payload.hd, config);
       if (!role) throw new HttpError(403, 'This Google account is not authorized for the portal.');
 
       req.user = {
@@ -51,4 +54,4 @@ function requireRole(...roles) {
   };
 }
 
-module.exports = { createGoogleAuthenticator, requireRole };
+module.exports = { createGoogleAuthenticator, requireRole, resolvePortalRole };
