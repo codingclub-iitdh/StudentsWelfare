@@ -2,28 +2,51 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
 import { requestTransitApi } from "./transitApi";
 
 const TransitAuthContext = createContext(null);
+const TRANSIT_SESSION_KEY = "transit-auth-session";
+
+const readStoredSession = () => {
+  try {
+    const rawValue = sessionStorage.getItem(TRANSIT_SESSION_KEY);
+    if (!rawValue) return null;
+    const parsedValue = JSON.parse(rawValue);
+    if (!parsedValue?.token || !parsedValue?.user) return null;
+    return parsedValue;
+  } catch {
+    return null;
+  }
+};
 
 export const TransitAuthProvider = ({ children }) => {
-  const [session, setSession] = useState(null);
+  const [session, setSession] = useState(() => readStoredSession());
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [signInError, setSignInError] = useState("");
+
+  useEffect(() => {
+    if (session) {
+      sessionStorage.setItem(TRANSIT_SESSION_KEY, JSON.stringify(session));
+      return;
+    }
+    sessionStorage.removeItem(TRANSIT_SESSION_KEY);
+  }, [session]);
 
   const signIn = useCallback(async (idToken) => {
     setIsSigningIn(true);
     setSignInError("");
     try {
       const result = await requestTransitApi("/me", idToken);
-      setSession({
+      const nextSession = {
         token: idToken,
         user: result.user,
         termsVersion: result.termsVersion,
-      });
+      };
+      setSession(nextSession);
       return result.user;
     } catch (error) {
       setSession(null);
